@@ -8,7 +8,7 @@
                 <div class="card-header">UserDashboard</div>
 
                 <div class="card-body">
-                   You are logged in!
+                   You are logged in - {{Auth::user()->name}}!!
                 </div>
             </div>
         </div>
