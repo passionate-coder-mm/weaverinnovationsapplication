@@ -1,0 +1,46 @@
+.err_log{
+    color:red;
+}
+.welcome-card{
+    text-align: center;
+    color: blue;
+    padding-top: 8px;
+}
+.error{
+    color:red;
+}
+.unqerror{
+     color:red!important;
+  }
+ .swal2-popup {
+    font-size: 1.6rem !important;
+  }
+.modal-header{
+    background: #3c8dbc;
+  }
+.modal-title{
+    color: #fff;
+    font-weight: bold;
+    font:22px;
+  }
+  .myselectlist{
+    list-style: none;
+    float: left;
+    background: #3c8dbc;
+    margin: 2px 2px 6px 1px;
+    border-radius: 4px;
+    padding: 2px;
+    color:#fff;
+  }
+  .removefromteam{
+    color:#fff;
+    padding: 3px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .personalinfo{
+    text-align: justify;
+  }
+  .actdeact{
+    cursor: pointer;
+  }

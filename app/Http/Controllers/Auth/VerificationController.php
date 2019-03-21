@@ -28,11 +28,11 @@ class VerificationController extends Controller
      */
     // protected $redirectTo = '/dashboard';
     protected function redirectTo( ) {
-        if (Auth::check() && Auth::user()->role == '1' && Auth::user()->role == '2') {
-            return '/admindashboard';
+        if (Auth::user()->role == '1' || Auth::user()->role == '2') {
+            return 'admin-dashboard';
         }
         else  {
-            return '/userdashboard';
+            return 'user-dashboard';
         }
     }
 

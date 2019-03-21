@@ -25,13 +25,13 @@ class HomeController extends Controller
     public function index()
     {  
         if(Auth::user()->role == 1){
-            return view('admindashboard');
+            return view('Backend.admindashboard');
 
         } else{
             return redirect('/userdashboard');
         }
     }
     public function waitingforvarification(){
-        return view('userdashboard');
+        return view('Backend.userdashboard');
     }
 }
