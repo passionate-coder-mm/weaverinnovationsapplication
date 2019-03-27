@@ -82,13 +82,16 @@
                    <div class="form-group">
                        <label for="image">User Image</label>
                        <input type="file" class="form-control" id="image" name="image">
+                       <img id="img" src="#" alt="your image" width="100" height="80" />
                    </div>
                 </div>
                 <div class="col-md-6">
                  <div class="form-group">
                      <label for="password">Password</label>
                      <input type="password" class="form-control" id="password" name="password"  placeholder="Enter Password(atleast 8 characters)">
-                 </div>
+                     {{-- <input type="text" class="form-control" id="conpass" name="con_pass"  placeholder="Enter Password(atleast 8 characters)"> --}}
+
+                    </div>
               </div>
            </div>
            <div class="row">
@@ -170,8 +173,8 @@
                     </td>
                     <td><img src="{{url('/'.$user->image)}}" width="100" height="50"></td>
                    <td>
-                       <a data-userid="{{$user->id}}" class="profile-view" data-designame="{{$designation != '' ? $designation->designation_name : 'N/A' }}" data-desigid ="{{$designation != '' ? $designation->id : 0}}" data-deptname="{{$deprtmentname !='' ? $deprtmentname->department_name : 'N/A'}}" data-deptid="{{$deprtmentname !='' ? $deprtmentname->id : 0}}" data-toggle="modal" data-target="#modal-profile-view" ><span class="glyphicon glyphicon-eye-open btn btn-info btn-sm"></span></a>
-                      <a  data-toggle="modal" data-userid="{{$user->id}}" data-designame="{{$designation != '' ? $designation->designation_name : 'N/A' }}" data-desigid ="{{$designation != '' ? $designation->id : 0}}" data-deptname="{{$deprtmentname !='' ? $deprtmentname->department_name : 'N/A'}}" data-deptid="{{$deprtmentname !='' ? $deprtmentname->id : 0}}"   data-target="#user-edit" class="edit_user" ><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a>
+                       <a data-userid="{{$user->id}}" class="profile-view" data-designame="{{$designation != '' ? $designation->designation_name : 'N/A' }}" data-desigid ="{{$designation != '' ? $designation->id : ''}}" data-deptname="{{$deprtmentname !='' ? $deprtmentname->department_name : 'N/A'}}" data-deptid="{{$deprtmentname !='' ? $deprtmentname->id : ''}}" data-toggle="modal" data-target="#modal-profile-view" ><span class="glyphicon glyphicon-eye-open btn btn-info btn-sm"></span></a>
+                      <a  data-toggle="modal" data-userid="{{$user->id}}" data-designame="{{$designation != '' ? $designation->designation_name : 'N/A' }}" data-desigid ="{{$designation != '' ? $designation->id : ''}}" data-deptname="{{$deprtmentname !='' ? $deprtmentname->department_name : 'N/A'}}" data-deptid="{{$deprtmentname !='' ? $deprtmentname->id : ''}}"   data-target="#user-edit" class="edit_user" ><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a>
                     <a data-userid="{{$user->id}}" class="delete_user" ><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td>
                   </tr>
                   @endforeach
@@ -246,6 +249,8 @@
                      <div class="form-group">
                          <label for="office_id">Office Id</label>
                          <input type="text" class="form-control" id="editofficeid" name="office_id" placeholder="Enter Office Id">
+                         <input type="hidden" class="form-control" id="hiddenrole" name="hiddenrole" placeholder="Enter Office Id">
+
                      </div>
                   </div>
                   <div class="col-md-6">
@@ -371,6 +376,7 @@
         $('#usereditform').find('#editnid').val(data[0].nid);
         $('#usereditform').find('#editofficeid').val(data[0].office_id);
         $('#usereditform').find('#editfinid').val(data[0].finger_id);
+        $('#usereditform').find('#hiddenrole').val(data[0].role);
         $.each(data[1],function(index,remainingdept){
           $('#editdeptselect').append(`<option  value="`+remainingdept.id+`">`+remainingdept.department_name+`</option>`);
         });
@@ -558,7 +564,7 @@ $(document).on('change','#departmentwiseloadchange',function(){
     $('#roleset').empty();
     $.get('getdesignation/'+deptid,function(data){
         console.log(data[1]);
-        $('#deptwisedesig').append('<option  disable="true" selected="true">Select Designation</option>');
+        $('#deptwisedesig').append('<option value=""  disable="true" selected="true">Select Designation</option>');
         $.each(data[0],function(index,desigantion){
         $('#deptwisedesig').append(`<option value="`+desigantion.id+`">`+desigantion.designation_name+`</option>`);
        });
@@ -575,13 +581,22 @@ $(document).on('change','#departmentwiseloadchange',function(){
     $('#editroleset').empty();
     $.get('getdesignation/'+deptid,function(data){
         console.log(data);
-        $('#editdesigselect').append('<option  disable="true" selected="true">Select Designation</option>');
+        $('#editdesigselect').append('<option value=""  disable="true" selected="true">Select Designation</option>');
         $.each(data[0],function(index,desigantion){
         $('#editdesigselect').append(`<option value="`+desigantion.id+`">`+desigantion.designation_name+`</option>`);
        });
-       $('#editroleset').append(`<option value="">Select Role</option>`);
-       $.each(data[1],function(index,role){
-        $('#editroleset').append(`<option value="`+role.id+`">`+role.role_name+`</option>`);
+      //  $('#editroleset').append(`<option value="">Select Role</option>`);
+       $.each(data[1],function(index,myrole){
+        var userrolesele = $('#usereditform').find('#hiddenrole').val();
+        console.log(userrolesele);
+          var userroleid = myrole.id; 
+          if(userrolesele == userroleid ){
+            $('#editroleset').append(`<option selected=="selected" value="`+myrole.id+`">`+myrole.role_name+`</option>`);
+
+          }else{
+            $('#editroleset').append(`<option value="`+myrole.id+`">`+myrole.role_name+`</option>`);
+
+          }
        });
     });
   });
@@ -611,31 +626,16 @@ $(document).on('change','#departmentwiseloadchange',function(){
                     "timeOut": 5000,
                     "extendedTimeOut": 1000
                     };
-                    if(data[1] !=''){
-                      var departmentname = data[1].department_name;
-                      var departmentid = data[1].id;
-                    } else{
-                      var departmentname = 'N/A';
-                      var departmentid = 0;
-
-                    }
-
-                    if(data[2] !=''){
-                      var designationname = data[2].designation_name;
-                      var designationid = data[2].id;
-                     } else{
-                      var designationname = 'N/A';
-                      var designationid = 0;
-                     }
                     
                 toastr.success('User Created Successfully');
+                $('#img').attr('src', '');
                 $('.ajaxuserprepend').prepend(`<tr class="unquser`+data.id+`">
                 <td>`+data[0].name+`</td>
-                <td>`+data[1].department_name+`</td>
-                <td>`+data[2].designation_name+`</td>
+                <td>`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`</td>
+                <td>`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`</td>
                 <td><img src="/`+data[0].image+`" width="100" height="50"></td>
-                <td><a data-userid="`+data[0].id+`" class="profile-view" data-designame="`+designationname+`" data-desigid ="`+designationid+`" data-deptname="`+departmentname+`" data-deptid="`+departmentid+`" data-toggle="modal" data-target="#modal-profile-view" " ><span class="glyphicon glyphicon-eye-open btn btn-info btn-sm"></span></a>
-                <a data-toggle="modal" data-userid="`+data[0].id+`"  data-target="#user-edit" data-designame="`+designationname+`" data-desigid ="`+designationid+`" data-deptname="`+departmentname+`" data-deptid="`+departmentid+`" class="edit_user"><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a>
+                <td><a data-userid="`+data[0].id+`" class="profile-view" data-designame="`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`" data-desigid ="`+((data[2]=="N/A") ? "" : data[2].id)+`" data-deptname="`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`" data-deptid="`+((data[1]=="N/A") ? "" : data[1].id)+`" data-toggle="modal" data-target="#modal-profile-view" " ><span class="glyphicon glyphicon-eye-open btn btn-info btn-sm"></span></a>
+                <a data-toggle="modal" data-userid="`+data[0].id+`"  data-target="#user-edit" data-designame="`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`" data-desigid ="`+((data[2]=="N/A") ? "" : data[2].id)+`" data-deptname="`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`" data-deptid="`+((data[1]=="N/A") ? "" : data[1].id)+`" class="edit_user"><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a>
                 <a data-userid=`+data[0].id+` class="delete_user"><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td>
             </tr>`);
          }
@@ -749,5 +749,26 @@ $(document).on('change','#departmentwiseloadchange',function(){
                  }
               )
        });
+       //image preview script
+       function readURL(input) {
+    var url = input.value;
+    var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+    if (input.files && input.files[0]&& (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg")) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#img').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }else{
+         $('#img').attr('src', '/assets/no_preview.png');
+    }
+}
+
+
+$("#image").change(function(){ 
+        readURL(this);
+    });
 </script>
 @endsection

@@ -17,7 +17,7 @@ Route::get('/', function () {
 });
 
 Auth::routes(['verify' => true]);
-Route::get('/home', 'HomeController@index')->middleware('verified');
+// Route::get('/home', 'HomeController@index')->middleware('verified');
 
 Route::get('/admin-dashboard', 'HomeController@index');
 Route::get('/user-dashboard', 'HomeController@waitingforvarification');
@@ -37,6 +37,11 @@ Route::group(['prefix' => 'department'], function () {
     Route::get('uniquenametest','Admin\DepartmentController@unqnamecheck');
     Route::get('deletedept/{deptid}','Admin\DepartmentController@destroy');
     Route::get('getdeptinfo/{deptid}','Admin\DepartmentController@departmentdetails');
+    Route::get('removeassmanager/{assmng}/{deptid}','Admin\DepartmentController@removeassistantmanager');
+    Route::get('removemember/{memberid}/{deptid}','Admin\DepartmentController@removemember');
+    Route::post('updatedepartmentinfo','Admin\DepartmentController@update');
+
+    
 });
 
 Route::group(['prefix' => 'designation'], function () {
@@ -59,6 +64,16 @@ Route::group(['prefix' =>'team'], function () {
     Route::get('updateteamstatus/{id}/{teamid}','Admin\TeamController@updateteamstatus');
     Route::get('getteaminfobyid/{teamid}','Admin\TeamController@getteaminfobyteam');
 });
-    
 
+
+Route::group(['prefix' =>'attendances'], function () {
+    Route::resource('attendance', 'Admin\AttendanceController');
+    Route::get('uniqueattchk','Admin\AttendanceController@unqattidchk');
+    Route::get('uniqueuserchk/{user_id}','Admin\AttendanceController@unquserchk');
+    Route::get('updateuserattstatus/{id}/{teamid}','Admin\AttendanceController@activedeactiveoption');
+    Route::get('attendancefilter','Admin\AttendanceController@showattendancefilter');
+    Route::get('dailyattendance/{attendanceid}/{inorout}','Admin\AttendanceController@userdailyattendance');
+    Route::post('datewiseattendance','Admin\AttendanceController@datewiseappendance');
+
+});
 // Route::get('/home', 'HomeController@index')->name('home');

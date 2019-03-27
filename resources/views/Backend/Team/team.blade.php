@@ -1,67 +1,6 @@
 @extends('Backend.admin_master')
 @section('main-content')
-<style>
-    .switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
 
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: -2px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #00a65a;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-</style>
 <section class="content" id="refreshdiv">
    <div class="box box-info">
         <div class="box-header with-border">
@@ -157,28 +96,7 @@ input:checked + .slider:before {
         <!-- /.col -->
     </div>
 </section>
-<script>
-    $(document).on('click','.deactive',function(){
-        var id = $(this).data('ofid');
-        var teamid = $(this).data('teamid');
-        $(this).removeClass('deactive');
-        $(this).addClass('active');
-        $.get('updateteamstatus/'+id+'/'+teamid,function(data){
 
-        })
-        //alert(id)
-    })
-    $(document).on('click','.active',function(){
-        var id = $(this).data('onid');
-        var teamid = $(this).data('teamid');
-        $(this).removeClass('active');
-        $(this).addClass('deactive');
-        $.get('updateteamstatus/'+id+'/'+teamid,function(data){
-            
-        })
-        //alert(id)
-    })
-</script>
 <!--Team edit modal-->
 <div class="modal fade" id="edit-team">
         <div class="modal-dialog">
@@ -465,6 +383,28 @@ $(document).on('click','.removefromteam',function(){
             console.log(data);
         });
     })
+  
+    $(document).on('click','.deactive',function(){
+        var id = $(this).data('ofid');
+        var teamid = $(this).data('teamid');
+        $(this).removeClass('deactive');
+        $(this).addClass('active');
+        $.get('updateteamstatus/'+id+'/'+teamid,function(data){
+
+        })
+        //alert(id)
+    })
+    $(document).on('click','.active',function(){
+        var id = $(this).data('onid');
+        var teamid = $(this).data('teamid');
+        $(this).removeClass('active');
+        $(this).addClass('deactive');
+        $.get('updateteamstatus/'+id+'/'+teamid,function(data){
+            
+        })
+        //alert(id)
+    })
+
 </script>
 @endsection
 

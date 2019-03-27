@@ -28,12 +28,12 @@ class VerificationController extends Controller
      */
     // protected $redirectTo = '/dashboard';
     protected function redirectTo( ) {
-        if (Auth::user()->role == '1' || Auth::user()->role == '2') {
-            return 'admin-dashboard';
-        }
-        else  {
-            return 'user-dashboard';
-        }
+        // if (Auth::user()->role == '1' || Auth::user()->role == '2') {
+        //     return 'admin-dashboard';
+        // }
+        // else  {
+        //     return 'user-dashboard';
+        // }
     }
 
     /**

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Mail;
 use App\Department;
 use App\Role;
 use App\Designation;
@@ -108,6 +110,10 @@ class UserController extends Controller
             } else{
                 $designation_name="N/A";
             }
+              $pass = $request->password;
+              Mail::to($request->email)->send(new WelcomeMail($user,$pass));
+             //return $user;
+
             return response()->json([$user,$department_name,$designation_name]);
     }
     public function getuserinfobyid($userid){
@@ -138,8 +144,23 @@ class UserController extends Controller
         } else {
             $remaining_desi ='';
         }
+        if(!empty($user_department)){
+            $chk_dept_manager = DB::table('users')
+                            ->leftJoin('userdepartments','users.id','=','userdepartments.user_id')
+                            ->where('userdepartments.department_id','=',$user_department->department_id)
+                            ->where('users.role','=',3)
+                            ->first();
+        }
 
-        $user_role = Role::all();
+       
+        if(!empty($chk_dept_manager)){
+            $user_role = Role::where('id','!=',3)->get();
+        } else{
+            $user_role = Role::all();
+        }
+
+        // $user_role = Role::all();
+
 
         return response()->json([$user_basicinfo,$remaining_dept,$remaining_desi,$user_role]);
 

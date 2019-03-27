@@ -20,62 +20,24 @@
           </ul>
         </li>
         @endif
-        {{-- <li>
-          <a href="">
-            <i class="fa fa-th"></i> <span>User</span>
-            <span class="pull-right-container">
-            </span>
-          </a>
-        </li>
-        <li>
-            <a href="">
-              <i class="fa fa-th"></i> <span>Role</span>
-              <span class="pull-right-container">
-              </span>
-            </a>
-          </li>
-        <li>
-          <a href="">
-            <i class="fa fa-th"></i> <span>Department</span>
-            <span class="pull-right-container">
-            </span>
-          </a>
-        </li>
-        <li>
-          <a href="">
-            <i class="fa fa-th"></i> <span>Designation</span>
-            <span class="pull-right-container">
-            </span>
-          </a>
-        </li>
-        <li>
-            <a href="">
-              <i class="fa fa-th"></i> <span>Team Creation</span>
-              <span class="pull-right-container">
-              </span>
-            </a>
-          </li>
-        <li>
-            <a href="">
-              <i class="fa fa-th"></i> <span>Team</span>
-              <span class="pull-right-container">
-              </span>
-            </a>
-          </li>
-          <li>
-          <a href ="">
-               <i class="fa fa-th"></i> <span>Attendance</span>
-                <span class="pull-right-container">
-              </span>
-            </a>  
-          </li>
-          <li>
-            <a href ="">
-                  <i class="fa fa-th"></i> <span>Attendance View</span>
-                  <span class="pull-right-container">
-                </span>
-              </a>  
-          </li> --}}
       </ul>
+
+      <ul class="sidebar-menu" data-widget="tree">
+          @if(Auth::user()->role == 1 || Auth::user()->role == 2 )
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-files-o"></i>
+              <span>Attendance Options</span>
+              <span class="pull-right-container">
+                <span class="label label-primary pull-right"></span>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="{{route('attendance.index')}}"><i class="fa fa-circle-o"></i> Attendance Info</a></li>
+              <li><a href="{{url('attendances/attendancefilter')}}"><i class="fa fa-circle-o"></i>Attendance Filter</a></li>
+           </ul>
+          </li>
+          @endif
+        </ul>
     </section>
   </aside>
