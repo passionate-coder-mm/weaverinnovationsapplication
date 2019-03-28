@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeMail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Jobs\WelcomeEmailJob;
 use App\Department;
 use App\Role;
 use App\Designation;
@@ -111,8 +113,13 @@ class UserController extends Controller
                 $designation_name="N/A";
             }
               $pass = $request->password;
-              Mail::to($request->email)->send(new WelcomeMail($user,$pass));
+               //Mail::to($request->email)->send(new WelcomeMail($user,$pass));
+            //   dispatch(new WelcomeEmailJob());
+            //   $emailJob = (new WelcomeEmailJob())->delay(Carbon::now()->addSeconds(3));
+            //   dispatch($emailJob);
              //return $user;
+             Mail::to($request->email)->queue(new WelcomeMail($user,$pass));
+
 
             return response()->json([$user,$department_name,$designation_name]);
     }
