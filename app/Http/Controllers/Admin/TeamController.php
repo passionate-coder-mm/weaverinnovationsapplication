@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use Illuminate\Support\Facades\Input;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -35,6 +36,31 @@ class TeamController extends Controller
     public function create()
     {
         
+    }
+    public function unqnamechk(){
+      $find_existing_name = Team::where('team_name',Input::get('team_name'))->first();
+      if($find_existing_name){
+        return response()->json('Name is already taken');
+        }else{
+            return response()->json('true');
+        }
+    }
+    public function unqnameforedit(){
+        $find_existing_name = Team::where('team_name',Input::get('team_name'))->first();
+        if(!empty($find_existing_name)){
+            $existing_id =  $find_existing_name->id;
+            $find_existing_name_id = Team::where('team_name',Input::get('team_name'))->where('id','!=',$existing_id)->first();
+            if( $find_existing_name_id){
+                return response()->json('Name is already taken');
+
+            }else{
+                return response()->json('true');
+            }
+ 
+        }else{
+            return response()->json('true');
+        }
+ 
     }
 
     /**

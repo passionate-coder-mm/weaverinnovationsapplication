@@ -71,8 +71,8 @@
                 
                 <div class="form-group">
                  <div class="box-body">
-                  <label for="rolename" class="col-sm-2 control-label">Role Name</label>
-                    <div class="col-sm-10">
+                  <label for="rolename" class="col-sm-4 control-label">Role Name</label>
+                    <div class="col-sm-8">
                      <input type="text" class="form-control" id="editrolename" name="role_name" value="">
                      <span class="edtunqerrtxt"></span>
                      <input type="hidden" class="form-control" id="roleid" name="role_id" value="" >

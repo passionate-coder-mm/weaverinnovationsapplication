@@ -498,3 +498,160 @@ p.sub {
 p.center {
   text-align: center;
 }
+.media-heading {
+  text-align: center;
+}
+.close {
+    
+    opacity: .80; 
+    color: #fff;
+    text-shadow: none;
+}
+.close:hover {
+   color: none;
+}
+.timeerror{
+  color:#fff;
+  background:#e21509;
+}
+.latecountcls{
+      color: #fff;
+    background: #dca609;
+    padding: 5px;
+    border-radius: 2px;
+}
+.noofabsent{
+      color: #fff;
+    background: red;
+    padding: 5px;
+    border-radius: 2px;
+}
+.noofworkingdays{
+   color: #fff;
+    background: #89dc09;
+    padding: 5px;
+    border-radius: 2px;
+}
+.myprint{
+ padding-top:0px;
+}
+.namecss{
+    color: #000;
+    font-weight: bold;
+}
+.latecss{
+    color: #fff;
+    background: #dc0d0d;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 2px;
+}
+.earlycss{
+    color: #fff;
+    background: #d61234;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-weight:bold;
+}
+.anualleavecss{
+    color:#fff;
+    background: #459e45;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+.sickleave{
+    color: #fff;
+    background: #86bf49;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+.absentcss{
+    color: #fff;
+    background: #0ba2bbe8;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+.laeadate{
+  display: none;
+}
+.smallboxh3{
+  color:#ffffff;
+}
+.smallboxp{
+    color:#ffffff;
+}
+.totalworkdays{
+  color: #459e45;
+}
+.lateapproval{
+    color: #fff;
+    background: #459e45;
+    padding: 5px;
+    border-radius: 2px;
+
+}
+.annualleave{
+  color: #fff;
+    background: #459e45;
+    padding: 5px;
+    border-radius: 2px;
+}
+input[name=project_name]{
+  outline: 0;
+  border-width: 0 0 1px;
+  border-color: #ddd
+  }
+  input:focus {
+  border-color: green
+  }
+  input[name=general_chk] {width:25px; height:25px;margin: 0px;}
+  .reviewing{
+    background: #ffb200;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .reviewed{
+    background: #12af44;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .cashbillul{
+   /* list-style: none; */
+  }
+  .pro_name{
+    background: #47c752;
+    color: #fff;
+    padding: 2px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .type{
+    background: red;
+    color: #fff;
+    padding: 2px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .typeli{
+    margin-top:11px;
+  }
+  .totalspan{
+    background: #ec0f2c;
+    padding: 5px;
+    border-radius: 3px;
+    color: #fff;
+    font-weight: bold;
+  }
+  .commonlitabforcash a {
+    color:rgb(36, 1, 1)!important;
+    background: #00c0ef;
+    font-size:15px;
+    font-weight:bold;
+  }

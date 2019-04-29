@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Department;
 use App\Userdepartment;
+use App\Userdesignation;
 use App\User;
+use Validator;
 use DB;
 
 class DepartmentController extends Controller
@@ -54,6 +56,7 @@ class DepartmentController extends Controller
             return response()->json('true');
         }
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -72,12 +75,20 @@ class DepartmentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $department = new Department();
-        $department->department_name = $request->department_name;
-        $department->save();
-        return response()->json($department);
-
+    {   
+        
+        $validator = Validator::make($request->all(), [
+            'department_name' => 'unique:departments|max:255'
+        ]);
+        if($validator->passes()){
+            $department = new Department();
+            $department->department_name = $request->department_name;
+            $department->save();
+            return response()->json($department);
+              
+        }else{
+            return response()->json('exist');
+        }
     }
 
     public function departmentdetails($deptid){
@@ -119,6 +130,7 @@ class DepartmentController extends Controller
                                 ->where('userdepartments.department_id','=',$deptid)
                                 ->select('users.id','users.name','userdepartments.department_id','userdepartments.user_id',)
                                 ->get();
+       
         if(!empty($find_existing_member)){
             $myaddedmember = array( );
             $i = 0;
@@ -126,11 +138,62 @@ class DepartmentController extends Controller
                 $i++;
                 $myaddedmember[$i] = $addedmember->id;
             }
-            $remainingmember = User::whereNotIn('id', $myaddedmember)
-                               ->where('role',5)
-                               ->get();
+            $remainingmemberid_from_userdept = Userdepartment::select('user_id')->get();
+            if(!empty($remainingmemberid_from_userdept)){
+                $dept_has_user = array();
+                $i = 0;  
+                foreach($remainingmemberid_from_userdept as $value){
+                    $i++;
+                    $dept_has_user[$i] = $value->user_id;
+                }
+                
+            }
+
+            $remainingmember = DB::table('users')
+                                ->leftJoin('userdepartments','users.id','=','userdepartments.user_id')
+                                 ->whereNotIn('users.id', $dept_has_user)
+                                //  ->where('userdepartments.department_id','!=',$deptid)
+                                ->where('users.role',5)
+                                ->select('users.name','users.id','userdepartments.department_id')
+                                ->get();
+            // $remainingmember = DB::table('users')
+            //                    ->leftJoin('userdepartments','users.id','=','userdepartments.user_id')
+            //                    ->whereNotIn('users.id', $myaddedmember)
+            //                    ->where('users.role',5)
+            //                    ->select('users.name','users.id','userdepartments.department_id')
+            //                    ->get();
+            // $final_rem = array( );
+            // foreach($remainingmember as $deptlessuser){
+            //     $i++;
+            //     if($deptlessuser->department_id =='null')
+            //     $final_rem[$i] = 
+            // }
         }else{
-            $remainingmember = User::where('role',5)->get(); 
+            // $remainingmember = User::where('role',5)->get(); 
+            // $remainingmember = DB::table('users')
+            //                    ->leftJoin('userdepartments','users.id','=','userdepartments.user_id')
+            //                    ->where('users.role',5)
+            //                    ->where('userdepartments.department_id','=','null')
+            //                    ->select('users.name','users.id','userdepartments.department_id')
+            //                    ->get();
+            $remainingmemberid_from_userdept = Userdepartment::select('user_id')->get();
+            if(!empty($remainingmemberid_from_userdept)){
+                $dept_has_user = array();
+                $i = 0;  
+                foreach($remainingmemberid_from_userdept as $value){
+                    $i++;
+                    $dept_has_user[$i] = $value->user_id;
+                }
+                
+            }
+
+            $remainingmember = DB::table('users')
+                                ->leftJoin('userdepartments','users.id','=','userdepartments.user_id')
+                                 ->whereNotIn('users.id', $dept_has_user)
+                                // ->where('userdepartments.department_id','!=',$deptid)
+                                ->where('users.role',5)
+                                ->select('users.name','users.id')
+                                ->get();
         }
     return response()->json([$find_all_manager,$chk_dept_manager,$find_all_assmanager,$find_ass_mng_by_dept,$find_existing_member,$remainingmember]);
     }
@@ -173,35 +236,49 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function changedepartmentrowmng($managerid){
+        $find_dept = DB::table('departments')
+                    ->leftJoin('Userdepartments','departments.id','=','Userdepartments.department_id')
+                    ->select('departments.department_name','Userdepartments.department_id')
+                    ->where('Userdepartments.user_id',$managerid)
+                    ->first();
+        if(!empty($find_dept)){
+            return response()->json($find_dept);
+        }
+    }
     public function update(Request $request)
     {  
+        //$data =  $request->all();
+        
         $find_existing_manager = DB::table('users')
                                 ->leftJoin('userdepartments','users.id','=','userdepartments.user_id')
                                 ->where('users.role',3)
                                 ->where('userdepartments.department_id','=',$request->dept_id)
                                 ->select('userdepartments.id')
                                 ->first();
-         if($find_existing_manager){
-             $find_mng_from_user_dept = Userdepartment::find($find_existing_manager->id);
-             $find_mng_from_user_dept->delete();
-            $update_dept_mng = Userdepartment::where('user_id',$request->manager_id)->first();
-            if( $update_dept_mng){
-                $update_dept_mng->department_id = $request->dept_id;
-                $update_dept_mng->save();
-            }else{
-                $update_dept_mng = new Userdepartment();
-                $update_dept_mng->user_id = $request->manager_id;
-                $update_dept_mng->department_id = $request->dept_id;
-                $update_dept_mng->save();
+         if($request->manager_id){
+            if($find_existing_manager){
+                $find_mng_from_user_dept = Userdepartment::find($find_existing_manager->id);
+                $find_mng_from_user_dept->delete();
+                $update_dept_mng = Userdepartment::where('user_id',$request->manager_id)->first();
+                if( $update_dept_mng){
+                    $update_dept_mng->department_id = $request->dept_id;
+                    $update_dept_mng->save();
+                }else{
+                    $update_dept_mng = new Userdepartment();
+                    $update_dept_mng->user_id = $request->manager_id;
+                    $update_dept_mng->department_id = $request->dept_id;
+                    $update_dept_mng->save();
 
-            }
-        }else{
-            $update_dept_mng = new Userdepartment();
-            $update_dept_mng->user_id = $request->manager_id;
-            $update_dept_mng->department_id = $request->dept_id;
-            $update_dept_mng->save();
+                }
+                }else{
+                    $update_dept_mng = new Userdepartment();
+                    $update_dept_mng->user_id = $request->manager_id;
+                    $update_dept_mng->department_id = $request->dept_id;
+                    $update_dept_mng->save();
 
-        }
+                }
+           } 
 
         if($request->assmanager_id){
             foreach($request->assmanager_id as $assistantmanager){
@@ -242,13 +319,7 @@ class DepartmentController extends Controller
                             ->where('userdepartments.department_id','=',$request->dept_id)
                             ->select('userdepartments.department_id','users.id as userid','users.name','departments.department_name')
                             ->first();
-        //  $find_final_manager = DB::table('departments')
-        //                 ->leftJoin('userdepartments','departments.id','=','userdepartments.department_id')
-        //                 ->leftJoin('users','users.id','=','userdepartments.user_id')
-        //                 ->select('users.name','departments.department_name')
-        //                 ->where('users.role',3)
-        //                 ->get();
-    
+        
         return response()->json($find_final_manager);
     }
 
@@ -261,6 +332,20 @@ class DepartmentController extends Controller
     public function destroy($id)
     {
         $delete_department = Department::find($id);
+        $find_dept_desig = DB::table('designations')
+                           ->leftJoin('userdesignations','designations.id','=','userdesignations.designation_id')
+                           ->where('designations.department_id',$id)
+                           ->select('userdesignations.id')
+                           ->get();
+                           //return  $find_dept_desig->id;  
+        if(!empty($find_dept_desig)){
+            foreach($find_dept_desig as $delid){
+                
+                $find_userdesid = Userdesignation::find($delid->id);
+                $find_userdesid->delete();
+            }
+            
+        }
         $delete_department->delete();
 
     }

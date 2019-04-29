@@ -9,11 +9,21 @@
              <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
            </div>
          </div>
+         {{-- @php
+         if(Auth::check()){
+        $user = Auth::user();
+        $user_name = $user->name;
+      }
+      else{
+          return redirect('login');
+      } --}}
+            
+        {{-- @endphp --}}
         
          <div class="box-body">
            <div class="row"> 
                <div class="welcome-card">
-                  <h4>Welcome {{Auth::user()->name}}</h4>
+                  {{-- <h4>Welcome {{$user_name}}</h4> --}}
                </div>
            </div>
          </div>

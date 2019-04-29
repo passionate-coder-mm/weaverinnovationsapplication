@@ -8,6 +8,7 @@ use App\Preattendance;
 use App\User;
 use App\Department;
 use App\Attendance;
+use App\Leave;
 use DB;
 
 class AttendanceController extends Controller
@@ -147,7 +148,68 @@ class AttendanceController extends Controller
                                 ->whereBetween('attendances.att_date', [$from_date, $to_date])
                                 ->where('preattendances.user_id','=',$user_id)
                                 ->get();
-        return response()->json($date_wise_attendance);
+        $gov_holiday_list = DB::table('governmentholidays')->select('date')->get();
+        $final_list = array( );
+        $i = 0;
+        foreach( $gov_holiday_list as $value){
+            $i++;
+            $final_list[$i] = $value->date; 
+        }
+        $late_approve_count = DB::table('leaves')->where('user_id',$user_id)->where('lateearlyapprove','=','yes')->whereBetween('date',[$from_date, $to_date])->count('id');
+        $annual_leave_count = DB::table('leaves')->where('user_id',$user_id)->where('annual_leave','=','yes')->whereBetween('date',[$from_date, $to_date])->count('id');
+        $sick_leave_count = DB::table('leaves')->where('user_id',$user_id)->where('sick_leave','=','yes')->whereBetween('date',[$from_date, $to_date])->count('id');
+
+        return response()->json([$date_wise_attendance,$final_list,$late_approve_count,$annual_leave_count,$sick_leave_count]);
+    }
+    public function showallattendancehistory(){
+        return view('Backend.Attendance.all_employee_attendance_summary');
+    }
+    public function datewiseallemployeeattendance(Request $request){
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        // $employee_attendance_summary = DB::select(DB::raw('SELECT t1.preattendance_id,t1.attendance_id,t2.late_entry,t2.early_leave, COUNT(t1.id) AS totalattend, COUNT(t2.late_entry) AS lateentry,COUNT(t2.early_leave) AS earlyleave FROM attendances t1 , attendances t2  WHERE t1.id = t2.id GROUP BY t1.attendance_id'));
+        $employee_attendance_summary = DB::select(DB::raw("SELECT users.name, preattendances.user_id, attendances.preattendance_id,attendances.attendance_id,attendances.late_entry,attendances.early_leave, COUNT(attendances.id) AS totalattend,COUNT(attendances.late_entry) AS lateentry,COUNT(attendances.early_leave) AS earlyleave   FROM attendances LEFT JOIN preattendances ON attendances.preattendance_id = preattendances.id LEFT JOIN users ON users.id = preattendances.user_id WHERE attendances.att_date BETWEEN '$from_date' AND '$to_date' GROUP BY attendance_id"));
+        $leave_count = DB::select(DB::raw("SELECT user_id, COUNT(annual_leave) AS annualleave,COUNT(sick_leave)AS sickleave FROM LEAVES WHERE date BETWEEN '04/01/2019' AND '04/04/2019' GROUP BY attendance_id"));  
+         $neqArray =[];
+         $i=0;
+         foreach($employee_attendance_summary as $summary){
+            $i++;
+            $count_annualleave = Leave::where('user_id',$summary->user_id)->where('annual_leave','=','yes')->whereBetween('date',[$from_date, $to_date])->get();
+            $count_sickleave = Leave::where('user_id',$summary->user_id)->where('sick_leave','=','yes')->whereBetween('date',[$from_date, $to_date])->get();
+            $count_laea_approve = Leave::where('user_id',$summary->user_id)->where('lateearlyapprove','=','yes')->whereBetween('date',[$from_date, $to_date])->get();
+            if($count_laea_approve){
+                $number_of_laea_approval = count($count_laea_approve);
+            }else{
+                $number_of_laea_approval = 0;
+            }
+            if($count_annualleave){
+                $number_of_sick_leave = count($count_sickleave);
+            }else{
+                $number_of_sick_leave = 0;
+            }
+            if($count_annualleave){
+                $numberof_leave = count($count_annualleave);
+            }else{
+                $numberof_leave = 0; 
+            }
+            $neqArray[$i]['name'] = $summary->name;
+            $neqArray[$i]['latecount'] = $summary->lateentry;
+            $neqArray[$i]['earlyleave'] = $summary->earlyleave;
+            $neqArray[$i]['totalattend'] = $summary->totalattend;
+            $neqArray[$i]['annualleave']=  $numberof_leave;
+            $neqArray[$i]['sickleave']=  $number_of_sick_leave;
+            $neqArray[$i]['lateapprove']=  $number_of_laea_approval;
+        }
+        $gov_holiday_list = DB::table('governmentholidays')->select('date')->get();
+        $final_list = array( );
+        $i = 0;
+        foreach( $gov_holiday_list as $value){
+            $i++;
+            $final_list[$i] = $value->date; 
+        }
+        return response()->json([$neqArray,$final_list]); 
+
+    
     }
 
     /**

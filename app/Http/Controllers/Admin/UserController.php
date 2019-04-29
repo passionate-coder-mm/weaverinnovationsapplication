@@ -14,6 +14,8 @@ use App\Designation;
 use App\User;
 use App\Userdepartment;
 use App\Userdesignation;
+use App\LoginActivity;
+use App\Preattendance;
 use DB;
 
 
@@ -75,6 +77,7 @@ class UserController extends Controller
     public function store(Request $request)
     {      
         // $userrr = $request->all();
+            $uniq_id = uniqid();
             $image = $request->file('image');
             $new_name = rand() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $new_name);
@@ -87,8 +90,15 @@ class UserController extends Controller
             $user->mobile_no = $request->mobile_no;
             $user->nid = $request->nid;
             $user->office_id = $request->office_id;
-            $user->finger_id = $request->finger_id;
+            $user->slug = $uniq_id;
+            //$user->finger_id = $request->finger_id;
             $user->save();
+            if($request->finger_id){
+               $attendance = new Preattendance();
+               $attendance->user_id = $user->id;
+               $attendance->attendance_id = $request->finger_id;;
+               $attendance->save();
+            }
 
             if($request->department_id !=null){
             $user_departmetn = new Userdepartment();
@@ -167,9 +177,10 @@ class UserController extends Controller
         }
 
         // $user_role = Role::all();
+        $finger_print_id = Preattendance::where('user_id',$userid)->first();
 
 
-        return response()->json([$user_basicinfo,$remaining_dept,$remaining_desi,$user_role]);
+        return response()->json([$user_basicinfo,$remaining_dept,$remaining_desi,$user_role,$finger_print_id]);
 
     }
 
@@ -223,13 +234,26 @@ class UserController extends Controller
            $user->mobile_no = $request->mobile_no;
            $user->nid = $request->nid;
            $user->office_id = $request->office_id;
-           $user->finger_id = $request->finger_id;
+        //   $user->finger_id = $request->finger_id;
            $user->save();
-           if($request->department_id){
-            $user_departmetn = Userdepartment::where('user_id','=',$request->user_id)->first();
-            $user_departmetn->department_id = $request->department_id;
-            $user_departmetn->save();
-            }
+           if($request->finger_id){
+            $attendance = Preattendance::where('user_id',$request->user_id)->first();
+            $attendance->attendance_id = $request->finger_id;;
+            $attendance->save();
+         }
+           if($request->department_id == 0){
+            $department = Userdepartment::where('user_id','=',$request->user_id)->first();
+            // $id = $department->id;
+            // $delete_able = Userdepartment::find($id);
+            $department->delete();
+           }
+           if($request->department_id > 0){
+                
+                    $user_departmetn = Userdepartment::where('user_id','=',$request->user_id)->first();
+                    $user_departmetn->department_id = $request->department_id;
+                    $user_departmetn->save();
+               
+           }
             if($request->designation_id){
             $user_designation = Userdesignation::where('user_id','=',$request->user_id)->first();;
             $user_designation->designation_id = $request->designation_id;
@@ -249,9 +273,23 @@ class UserController extends Controller
            $user->mobile_no = $request->mobile_no;
            $user->nid = $request->nid;
            $user->office_id = $request->office_id;
-           $user->finger_id = $request->finger_id;
+           //$user->finger_id = $request->finger_id;
            $user->save();
-           if($request->department_id){
+           $user->save();
+           if($request->finger_id){
+            $attendance = Preattendance::where('user_id',$request->user_id)->first();
+            $attendance->attendance_id = $request->finger_id;;
+            $attendance->save();
+         }
+           if($request->department_id == 0){
+            $department = Userdepartment::where('user_id','=',$request->user_id)->first();
+            $department->delete();
+            $designation = Userdesignation::where('user_id','=',$request->user_id)->first();
+            if(!empty($designation)){
+                $designation->delete();
+             }
+           }
+           if($request->department_id > 0){
             $user_departmetn = Userdepartment::where('user_id','=',$request->user_id)->first();
                 if(!empty($user_departmetn)){
                     $user_departmetn->department_id = $request->department_id;
@@ -277,8 +315,18 @@ class UserController extends Controller
                 }
                 
             }
-            $department_name = Department::select('department_name','id')->where('id','=',$request->department_id)->first();
-            $designation_name = Designation::select('designation_name','id')->where('id','=',$request->designation_id)->first();
+            if($request->department_id != null && $request->department_id >0){
+                $department_name = Department::select('department_name','id')->where('id','=',$request->department_id)->first();
+                }else{
+                    $department_name="N/A";
+                }
+                if($request->designation_id !=null){
+                 $designation_name = Designation::select('designation_name','id')->where('id','=',$request->designation_id)->first();
+                } else{
+                    $designation_name="N/A";
+                }
+            // $department_name = Department::select('department_name','id')->where('id','=',$request->department_id)->first();
+            // $designation_name = Designation::select('designation_name','id')->where('id','=',$request->designation_id)->first();
            return response()->json([$user,$department_name,$designation_name]);
 
         }
@@ -291,6 +339,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function loginhistoty(){
+        $logged_users = LoginActivity::all();
+        return view('Backend.Userlogged.logged',compact('logged_users'));
+    }
     public function destroy($id)
     {
         $delete_user = User::find($id);

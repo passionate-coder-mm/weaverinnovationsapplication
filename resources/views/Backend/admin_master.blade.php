@@ -2,18 +2,20 @@
 <html>
 @include('Backend.Include.head')
 <body class="hold-transition skin-blue sidebar-mini">
+
+
 <div class="wrapper">
     @include('Backend.Include.header')
     @include('Backend.Include.sidebar')
    <div class="content-wrapper">
-      @yield('main-content')
+     @yield('main-content')
+   
   </div>
   @include('Backend.Include.footer')
 </div>
 <!-- jQuery 3 -->
 {{-- <script src="{{asset('themeasset/bower_components/jquery/dist/jquery.min.js')}}"></script> --}}
 <!-- Bootstrap 3.3.7 -->
-
 <script src="{{asset('themeasset/bower_components/bootstrap/dist/js/bootstrap.min.js')}}"></script>
 <script src="{{asset('themeasset/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{asset('themeasset/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
@@ -48,6 +50,7 @@
     //Initialize Select2 Elements
     $('.select2').select2()
     $('#example3').DataTable()
+    $('#example4').DataTable()
     $('#example2').DataTable({
       'paging'      : true,
       'lengthChange': false,
@@ -56,6 +59,7 @@
       'info'        : true,
       'autoWidth'   : false
     })
+    
 
     // //Datemask dd/mm/yyyy
     // $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })

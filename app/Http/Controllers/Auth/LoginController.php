@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Auth;
-
 class LoginController extends Controller
 {
     /*
@@ -26,15 +25,16 @@ class LoginController extends Controller
      *
      * @var string
      */
-    // protected $redirectTo = '/home';
+     protected $redirectTo = '/admin-dashboard';
     // protected function redirectTo( ) {
-    //     if (Auth::check() && Auth::user()->role == '1') {
-    //        return redirect('/home');
-    //         // return $next($request);
-    //     }
-    //     else  {
-    //         return redirect('/userdashboard');
-    //     }
+    //     if (Auth::user()->role == 3 || Auth::user()->role == '2') {
+    //         return redirect('admin-dashboard');
+    //          // return $next($request);
+    //      }
+    //      else  {
+    //          return redirect('user-dashboard');
+    //      }
+    //      return $next($request);
        
     // }
      

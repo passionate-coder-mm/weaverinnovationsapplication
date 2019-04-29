@@ -1,7 +1,6 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
-
+use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Designation;
@@ -33,6 +32,14 @@ class DesignationController extends Controller
     public function create()
     {
         //
+    }
+    public function uniqnamechk($deptid,$designation){
+     $find_existing_desgnation = Designation::where('department_id',$deptid)->where('designation_name',$designation)->first();
+     if(!empty($find_existing_desgnation)){
+         return response()->json('exist');
+     }else{
+        return response()->json('notexist');
+     }
     }
 
     /**
@@ -91,18 +98,23 @@ class DesignationController extends Controller
 
     }
     public function update(Request $request)
-    {
+    {   
+        $existancey_in_other_id =Designation::where('id','!=',$request->designation_id)->where('department_id',$request->department_id)->where('designation_name',$request->designation_name)->first();
+        if(!empty($existancey_in_other_id)){
+            return response()->json('exist');
+        }else{
         $updated_desig = Designation::find($request->designation_id);
         $updated_desig->designation_name = $request->designation_name;
         $updated_desig->department_id = $request->department_id;
         $updated_desig->save();
         $designation_department = DB::table('designations') 
                                     ->leftJoin('departments','departments.id','=','designations.department_id')
-                                    ->select('designations.designation_name','designations.id as desigid','designations.department_ids','departments.department_name')
+                                    ->select('designations.designation_name','designations.id as desigid','designations.department_id','departments.department_name')
                                     ->where('designations.id','=',$request->designation_id)
                                     ->first();
         //$updated_desig = $request->all();
         return response()->json($designation_department);
+        }
     }
 
     /**

@@ -37,12 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    // public function department()
-    // {
-    //     return $this->belongsTo('App\Department');
-    // }
-    // public function designation()
-    // {
-    //     return $this->belongsTo('App\Department');
-    // }
+    public function getRouteKeyName()
+    { 
+        return 'slug';
+    }
 }

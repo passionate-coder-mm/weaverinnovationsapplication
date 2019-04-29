@@ -62,52 +62,52 @@
                    </div>
                </div>
            </div>
+           <div class="row">
+              <div class="col-md-6">
+                   <div class="form-group customrole">
+                       <label for="exampleInputEmail1">Select Role</label>
+                       <select id="roleset" class="form-control select2" style="width: 100%;" name="role">
+                         <option  value="">Select Role</option>
+                         @foreach($role_list as $role)
+                          <option class="forroletype" value="{{$role->id}}" >{{$role->role_name}}</option>
+                         @endforeach
+                       </select>
+                  </div>
+                 </div>
+                 <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="office_id">Office Id</label>
+                      <input type="text" class="form-control" id="office_id" name="office_id" placeholder="Enter Office Id">
+                  </div>
+               </div>
+           </div>
           
            <div class="row">
-                <div class="col-md-6">
-                   <div class="form-group">
-                       <label for="office_id">Office Id</label>
-                       <input type="text" class="form-control" id="office_id" name="office_id" placeholder="Enter Office Id">
-                   </div>
-                </div>
+                
                 <div class="col-md-6">
                  <div class="form-group">
                      <label for="finp_id">Fingerprint Id</label>
                      <input type="text" class="form-control" id="finp_id" name="finger_id"  placeholder="Enter finger print Id">
                  </div>
               </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password"  placeholder="Enter Password(atleast 8 characters)">
+                   </div>
+             </div>
            </div>
            <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                    <div class="form-group">
                        <label for="image">User Image</label>
                        <input type="file" class="form-control" id="image" name="image">
                        <img id="img" src="#" alt="your image" width="100" height="80" />
                    </div>
                 </div>
-                <div class="col-md-6">
-                 <div class="form-group">
-                     <label for="password">Password</label>
-                     <input type="password" class="form-control" id="password" name="password"  placeholder="Enter Password(atleast 8 characters)">
-                     {{-- <input type="text" class="form-control" id="conpass" name="con_pass"  placeholder="Enter Password(atleast 8 characters)"> --}}
-
-                    </div>
-              </div>
+                
            </div>
-           <div class="row">
-              
-                <div class="col-md-12">
-                     <div class="form-group customrole">
-                         <label for="exampleInputEmail1">Select Role</label>
-                         <select id="roleset" class="form-control select2" style="width: 100%;" name="role">
-                           <option  value="">Select Role</option>
-                           @foreach($role_list as $role)
-                            <option class="forroletype" value="{{$role->id}}" >{{$role->role_name}}</option>
-                           @endforeach
-                         </select>
-                    </div>
-                   </div>
-             </div>
+           
            <div class="box-footer">
                <button type="submit" class="btn btn-primary">Create User</button>
            </div>
@@ -245,20 +245,36 @@
                    </div>
                </div>
                <div class="row">
-                  <div class="col-md-6">
-                     <div class="form-group">
-                         <label for="office_id">Office Id</label>
-                         <input type="text" class="form-control" id="editofficeid" name="office_id" placeholder="Enter Office Id">
-                         <input type="hidden" class="form-control" id="hiddenrole" name="hiddenrole" placeholder="Enter Office Id">
+                <div class="col-md-6">
+                     <div class="form-group customrole">
+                         <label for="exampleInputEmail1">Select Role</label>
+                         <select id="editroleset" class="form-control select2 myroleselected" style="width: 100%;" name="role">
+                          
+                         </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="office_id">Office Id</label>
+                      <input type="text" class="form-control" id="editofficeid" name="office_id" placeholder="Enter Office Id">
+                      <input type="hidden" class="form-control" id="hiddenrole" name="hiddenrole" placeholder="Enter Office Id">
 
-                     </div>
                   </div>
+               </div>
+             </div>
+               <div class="row">
                   <div class="col-md-6">
                    <div class="form-group">
                        <label for="finp_id">Fingerprint Id</label>
-                       <input type="text" class="form-control" id="editfinid" name="finger_id"  placeholder="Enter finger print Id">
+                       <input type="text" class="form-control" id="fingeridedit" name="finger_id"  placeholder="Enter finger print Id">
                    </div>
                 </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="password">Password</label>
+                      <input type="password" class="form-control" id="editpass" name="password"  placeholder="Enter Password">
+                  </div>
+               </div>
              </div>
               
                <div class="row">
@@ -267,31 +283,14 @@
                   </div>
                 </div>
                <div class="row">
-                    <div class="col-md-6">
-                      
-                       <div class="form-group">
+                    <div class="col-md-12">
+                      <div class="form-group">
                            <label for="image">User Image</label>
                            <input type="file" class="form-control" id="editimage" name="image">
                        </div>
                     </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" id="editpass" name="password"  placeholder="Enter Password">
-                        </div>
-                     </div>
                </div>
-               <div class="row">
-                  <div class="col-md-12">
-                       <div class="form-group customrole">
-                           <label for="exampleInputEmail1">Select Role</label>
-                           <select id="editroleset" class="form-control select2 myroleselected" style="width: 100%;" name="role">
-                            
-                           </select>
-                      </div>
-                  </div>
-               </div>
+             
                <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary">Update User</button>
@@ -377,7 +376,11 @@
         $('#usereditform').find('#editofficeid').val(data[0].office_id);
         $('#usereditform').find('#editfinid').val(data[0].finger_id);
         $('#usereditform').find('#hiddenrole').val(data[0].role);
-        $.each(data[1],function(index,remainingdept){
+        if(data[4] !=null){
+          $('#usereditform').find('#fingeridedit').val(data[4].attendance_id);
+        }
+        $('#editdeptselect').append(`<option  value="0">Make it department Less</option>`);
+          $.each(data[1],function(index,remainingdept){
           $('#editdeptselect').append(`<option  value="`+remainingdept.id+`">`+remainingdept.department_name+`</option>`);
         });
         $.each(data[2],function(index,remainingdesig){
@@ -614,7 +617,7 @@ $(document).on('change','#departmentwiseloadchange',function(){
             processData: false,
             success:function(data)
             { 
-            console.log(data);
+           // console.log(data);
             $('#userform').trigger('reset');
             toastr.options =
                    {
@@ -629,7 +632,7 @@ $(document).on('change','#departmentwiseloadchange',function(){
                     
                 toastr.success('User Created Successfully');
                 $('#img').attr('src', '');
-                $('.ajaxuserprepend').prepend(`<tr class="unquser`+data.id+`">
+                $('.ajaxuserprepend').prepend(`<tr class="unquser`+data[0].id+`">
                 <td>`+data[0].name+`</td>
                 <td>`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`</td>
                 <td>`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`</td>
@@ -677,30 +680,31 @@ $(document).on('change','#departmentwiseloadchange',function(){
       processData: false,
       success:function(data)
       { 
-        if(data[1] !=''){
-                      var departmentname = data[1].department_name;
-                      var departmentid = data[1].id;
-                    } else{
-                      var departmentname = 'N/A';
-                      var departmentid = 0;
-
-                    }
-
-                    if(data[2] !=''){
-                      var designationname = data[2].designation_name;
-                      var designationid = data[2].id;
-                     } else{
-                      var designationname = 'N/A';
-                      var designationid = 0;
-                     }
         console.log(data);
+                    // if(data[1] !=''){
+                    //   var departmentname = data[1].department_name;
+                    //   var departmentid = data[1].id;
+                    // } else{
+                    //   var departmentname = 'N/A';
+                    //   var departmentid = 0;
+
+                    // }
+
+                    // if(data[2] !=''){
+                    //   var designationname = data[2].designation_name;
+                    //   var designationid = data[2].id;
+                    //  } else{
+                    //   var designationname = 'N/A';
+                    //   var designationid = 0;
+                    //  }
+                  console.log(data);
         $('.unquser'+data[0].id).replaceWith(`<tr class="unquser`+data[0].id+`">
                 <td>`+data[0].name+`</td>
-                <td>`+data[1].department_name+`</td>
-                <td>`+data[2].designation_name+`</td>
+                <td>`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`</td>
+                <td>`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`</td>
                 <td><img src="/`+data[0].image+`" width="100" height="50"></td>
-                <td><a data-userid="`+data[0].id+`" class="profile-view" data-designame="`+designationname+`" data-desigid ="`+designationid+`" data-deptname="`+departmentname+`" data-deptid="`+departmentid+`" data-toggle="modal" data-target="#modal-profile-view" " ><span class="glyphicon glyphicon-eye-open btn btn-info btn-sm"></span></a>
-                <a data-toggle="modal" data-userid="`+data[0].id+`"  data-target="#user-edit" data-designame="`+designationname+`" data-desigid ="`+designationid+`" data-deptname="`+departmentname+`" data-deptid="`+departmentid+`" class="edit_user"><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a>
+                <td><a data-userid="`+data[0].id+`" class="profile-view" data-designame="`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`" data-desigid ="`+((data[2]=="N/A") ? "N/A" : data[2].id)+`" data-deptname="`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`" data-deptid="`+((data[1]=="N/A") ? "N/A" : data[1].id)+`" data-toggle="modal" data-target="#modal-profile-view" " ><span class="glyphicon glyphicon-eye-open btn btn-info btn-sm"></span></a>
+                <a data-toggle="modal" data-userid="`+data[0].id+`"  data-target="#user-edit" data-designame="`+((data[2]=="N/A") ? "N/A" : data[2].designation_name)+`" data-desigid ="`+((data[2]=="N/A") ? "N/A" : data[2].id)+`" data-deptname="`+((data[1]=="N/A") ? "N/A" : data[1].department_name)+`" data-deptid="`+((data[1]=="N/A") ? "N/A" : data[1].id)+`" class="edit_user"><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a>
                 <a data-userid=`+data[0].id+` class="delete_user"><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td>
             </tr>`);
         $('#usereditform').trigger('reset');
@@ -715,9 +719,7 @@ $(document).on('change','#departmentwiseloadchange',function(){
                     };
         setTimeout(function() {toastr.success('User Updated Successfully');}, 2000);
         setTimeout(function() {$('#user-edit').modal('hide');}, 1500);
-
-      
-      }
+       }
     })
   });
   //Delete user

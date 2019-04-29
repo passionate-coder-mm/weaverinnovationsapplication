@@ -1,7 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-@if(Auth::user()->role == 1)
+@php
+ if(Auth::check()){
+         $user = Auth::user();
+         $user_role = $user->role;
+         $user_name = $user->name;
+       }
+       else{
+           return redirect('login');
+       }
+@endphp
+@if($user_role == 1)
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -15,7 +25,7 @@
                         </div>
                     
 
-                    You are logged in - {{Auth::user()->name}}!
+                    You are logged in - {{$user_name}}!
                 </div>
             </div>
         </div>

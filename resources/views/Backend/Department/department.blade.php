@@ -3,14 +3,14 @@
 <section class="content">
     <div class="box box-default">
          <div class="box-header with-border">
-           <h3 class="box-title">Admin Dashboard</h3>
+           <h3 class="box-title">Department</h3>
               <div class="box-tools pull-right">
              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
              <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
            </div>
          </div>
          
-         {!!Form::open(['id'=>'departmentformfinal','method' => 'post'])!!}
+         {!!Form::open(['id'=>'departmentform','method' => 'post'])!!}
            <div class="box-body">
                <div class="row"> 
                   <div class="form-group">
@@ -22,7 +22,7 @@
                </div>
             </div>
             <div class="box-footer">
-                <button type="submit" class="btn btn-info">Create Department</button>
+                <button type="submit" id="deptdisable" class="btn btn-info">Create Department</button>
             </div>
          {!!Form::close()!!}
         </div>
@@ -93,16 +93,16 @@
                     {!!Form::open(['method' => 'POST','class' => 'form-horizontal','id'=>'departmentedit'])!!}
                     <div class="box-body">
                         <div class="form-group">
-                            <label for="teamname" class="col-sm-3 control-label">Department Name</label>
-                            <div class="col-sm-9">
+                            <label for="teamname" class="col-sm-4 control-label">Name</label>
+                            <div class="col-sm-8">
                             <input type="text" class="form-control" id="edtdeptname" name="department_name" readonly>
-                            <input type="text" class="form-control" id="deptid" name="dept_id" placeholder="">
+                            <input type="hidden" class="form-control" id="deptid" name="dept_id" placeholder="">
 
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="inputPassword3" class="col-sm-3 control-label"> Manager</label>
-                            <div class="col-sm-9">
+                            <label for="inputPassword3" class="col-sm-4 control-label"> Manager</label>
+                            <div class="col-sm-8">
                                 <select id="deptmanager" class="form-control select2 " style="width: 100%;" name="manager_id">
                                     <option value="">select Manager</option>
                                     
@@ -112,8 +112,8 @@
                         
                         <div class="form-group">
                                 
-                          <label for="inputPassword3" class="col-sm-3 control-label"> Assistant Manager</label>
-                          <div class="col-sm-9">
+                          <label for="inputPassword3" class="col-sm-4 control-label"> Assistant Manager</label>
+                          <div class="col-sm-8">
                                   <div class='sedepartmentassmang'></div>
                                   <select id="deptassmanager" class="form-control select2" multiple="multiple" data-placeholder="Select assistant Manager"
                                   style="width: 100%;" name="assmanager_id[]">
@@ -123,8 +123,8 @@
                       </div>
                         <div class="form-group">
                                 
-                            <label for="inputPassword3" class="col-sm-3 control-label">Select Executives</label>
-                            <div class="col-sm-9">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Select Executives</label>
+                            <div class="col-sm-8">
                                     <div class='sedepartmentmembers'></div>
                                     <select id="deptmembers" class="form-control select2" multiple="multiple" data-placeholder="Select members"
                                     style="width: 100%;" name="teammember_id[]">
@@ -150,15 +150,11 @@
                   {
                     required: true,
                     remote: {
-                            url: "uniquenametest"
+                        url: "uniquenametest"
                     },
                  }
             },
-            messages: {
-                department_name: {
-                        remote:("Name is already in use")
-                    },
-                  },
+            
             highlight: function(element) {
                 $(element).parent().addClass('has-error');
             },
@@ -168,9 +164,10 @@
          });
        });
        //Department insertion
-       $('#departmentformfinal').on('submit',function(e){
+       $('#departmentform').on('submit',function(e){
           e.preventDefault();
           var data = $(this).serialize();
+          if ($('#departmentform').valid()) {
            $.ajax({
               url:"{{route('department_options.store')}}",
               method:"POST",
@@ -178,6 +175,10 @@
               dataType:"json",
               success:function(data)
               {
+                if(data == 'exist'){
+                  console.log('Please enter a unq department');
+
+                }else{
                 toastr.options = {
                         "debug": false,
                         "positionClass": "toast-bottom-right",
@@ -191,7 +192,9 @@
                 $('.deprtmentprepend').prepend(`<tr class="unqdeptid`+data.id+`"><td>`+data.department_name+`</td><td>Manager</td><td><a data-toggle="modal" data-target="#edit-department" class="editdepartment" data-deptname="`+data.department_name+`" data-deptid="`+data.id+`" ><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a> <a class="deletedept" data-deptid="`+data.id+`"><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td></tr>`);          
                 $('#departmentform').trigger('reset');
               }
+              }
           });
+          }
      });
      //edit department
      $(document).on('click','.editdepartment',function(){
@@ -254,6 +257,16 @@
        $('.sedepartmentassmang').find('#uniquassmng'+assmngid).remove();
        $.get('removeassmanager/'+assmngid+'/'+deptid,function(data){
          //console.log(data);
+         toastr.options = {
+                        "debug": false,
+                        "positionClass": "toast-bottom-right",
+                        "onclick": null,
+                        "fadeIn": 300,
+                        "fadeOut": 1000,
+                        "timeOut": 5000,
+                        "extendedTimeOut": 1000
+          };
+          setTimeout(function() {toastr.success('Assistant manager was moved  Successfully');}, 2000);
        })
      })
      $(document).on('click','.removemember',function(){
@@ -261,16 +274,34 @@
        var deptid = $('#departmentedit').find('#deptid').val();
        $('.sedepartmentmembers').find('#uniqumem'+memberid).remove();
         $.get('removemember/'+memberid+'/'+deptid,function(data){
-         //console.log(data);
+          toastr.options = {
+                        "debug": false,
+                        "positionClass": "toast-bottom-right",
+                        "onclick": null,
+                        "fadeIn": 300,
+                        "fadeOut": 1000,
+                        "timeOut": 5000,
+                        "extendedTimeOut": 1000
+          };
+          setTimeout(function() {toastr.success('Executive was moved  Successfully');}, 1000);
        })
 
-       //alert(memberid);
      })
-     //updation script
-     $(document).on('submit','#departmentedit',function(e){
+//update old manager 
+$(document).on('change','#deptmanager',function(){
+  var managerid  = $('#deptmanager :selected').val();
+  //alert(managerid);
+  $.get('changeolddeptmng/'+managerid,function(data){
+    $('.unqdeptid'+data.department_id).replaceWith(`<tr class="unqdeptid`+data.department_id+`"><td>`+data.department_name+`</td><td>N/A</td><td><a data-toggle="modal" data-target="#edit-department" class="editdepartment" data-deptname="`+data.department_name+`" data-deptid="`+data.department_id+`" ><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a> <a class="deletedept" data-deptid="`+data.department_id+`"><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td></tr>`);          
+  })
+})
+//updation script
+
+$(document).on('submit','#departmentedit',function(e){
+  
       e.preventDefault();
-          var data = $(this).serialize();
-           $.ajax({
+          var data =  $(this).serialize();
+          $.ajax({
               url:"updatedepartmentinfo",
               method:"POST",
               data:data,
@@ -288,9 +319,9 @@
                         "extendedTimeOut": 1000
                       };
                       setTimeout(function() {toastr.success('Department Updated Successfully');}, 2000);
-                $('.deprtmentprepend').prepend(`<tr class="unqdeptid`+data.department_id+`"><td>`+data.department_name+`</td><td>`+data.name+`</td><td><a data-toggle="modal" data-target="#edit-department" class="editdepartment" data-deptname="`+data.department_name+`" data-deptid="`+data.department_id+`" ><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a> <a class="deletedept" data-deptid="`+data.department_id+`"><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td></tr>`);          
-                setTimeout(function() {$('#edit-department').modal('hide');}, 1500);
-                $('#departmentform').trigger('reset');
+                      $('.unqdeptid'+data.department_id).replaceWith(`<tr class="unqdeptid`+data.department_id+`"><td>`+data.department_name+`</td><td>`+data.name+`</td><td><a data-toggle="modal" data-target="#edit-department" class="editdepartment" data-deptname="`+data.department_name+`" data-deptid="`+data.department_id+`" ><span class="glyphicon glyphicon-edit btn btn-primary btn-sm"></span></a> <a class="deletedept" data-deptid="`+data.department_id+`"><span class="glyphicon glyphicon-trash btn btn-danger btn-sm"></span></a></td></tr>`);          
+                    setTimeout(function() { $('#edit-department').modal('hide');}, 1500);
+                  $('#departmentform').trigger('reset');
               }
           });
      })

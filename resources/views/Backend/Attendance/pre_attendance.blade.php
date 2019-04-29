@@ -3,7 +3,7 @@
 <?php
 use App\Department;
 ?>
-<section class="content">
+{{-- <section class="content">
     <div class="box box-info">
             <div class="box-header with-border">
                 <h3 class="box-title">Attendance UI</h3>
@@ -34,20 +34,20 @@ use App\Department;
                 </div>
                {!!Form::close()!!}
     </div>
-</section>
+</section> --}}
 <section class="content">
         <div class="row">
           <div class="col-xs-12">
             <div class="box box-info">
               <div class="box-header">
-                <h3 class="box-title">Role list</h3>
+                <h3 class="box-title">Attendance List</h3>
                  <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                     <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
                   </div>
                  </div>
               <div class="box-body">
-                <table id="example1" class="table table-bordered table-striped ajaxattendanceprepend">
+                <table id="example3" class="table table-bordered table-striped ajaxattendanceprepend">
                   <thead>
                   <tr>
                     <th>User Name</th>

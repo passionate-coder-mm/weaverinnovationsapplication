@@ -9,7 +9,7 @@
     <li>Password:- {{$pass}}</li>
 </ul>
 
-@component('mail::button', ['url' => 'blabla.com'])
+@component('mail::button', ['url' => 'http://localhost:8000/login'])
   Login Here
 @endcomponent
 Thanks<br>
