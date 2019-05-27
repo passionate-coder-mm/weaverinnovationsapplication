@@ -7,11 +7,14 @@ use App\Http\Controllers\Controller;
 use App\ConveyanceVoucher;
 use App\Billnotification;
 use App\Userdepartment;
+use App\projectname;
 use DateTime;
 use DateTimeZone;
 use App\User;
 use DB;
 use Auth;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
 
 class TransportVoucherController extends Controller
 {
@@ -23,31 +26,67 @@ class TransportVoucherController extends Controller
     public function index()
     {   
         $data = [];
-       $data['executive_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.review,conveyance_vouchers.created_at,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,conveyance_vouchers.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+       $data['executive_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.review,conveyance_vouchers.created_at,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
                                     FROM conveyance_vouchers
                                     LEFT JOIN users ON conveyance_vouchers.user_id = users.id
-                                    WHERE users.role = 5
+                                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                    WHERE users.role = 5 AND conveyance_vouchers.success='no' 
                                     GROUP BY(conveyance_vouchers.unq_id)"));
-        $data['manager_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,conveyance_vouchers.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+        $data['executive_con_success'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.review,conveyance_vouchers.created_at,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
                                     FROM conveyance_vouchers
                                     LEFT JOIN users ON conveyance_vouchers.user_id = users.id
-                                    WHERE users.role = 3
+                                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                    WHERE users.role = 5 AND conveyance_vouchers.success='yes' 
                                     GROUP BY(conveyance_vouchers.unq_id)"));
-        $data['assmanager_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,conveyance_vouchers.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+        $data['manager_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
                                     FROM conveyance_vouchers
                                     LEFT JOIN users ON conveyance_vouchers.user_id = users.id
-                                    WHERE users.role = 4
+                                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                    WHERE users.role = 3 AND conveyance_vouchers.success='no'
                                     GROUP BY(conveyance_vouchers.unq_id)"));
-         $data['ceo_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.review,conveyance_vouchers.created_at,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,conveyance_vouchers.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
-                                    FROM conveyance_vouchers
-                                    LEFT JOIN users ON conveyance_vouchers.user_id = users.id
-                                    WHERE users.role = 6
-                                    GROUP BY(conveyance_vouchers.unq_id)"));
-         $data['cfo_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,conveyance_vouchers.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+        $data['manager_con_success'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
                                      FROM conveyance_vouchers
                                      LEFT JOIN users ON conveyance_vouchers.user_id = users.id
-                                     WHERE users.role = 7
+                                     LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                     WHERE users.role = 3 AND conveyance_vouchers.success='yes'
                                      GROUP BY(conveyance_vouchers.unq_id)"));
+        $data['assmanager_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+                                    FROM conveyance_vouchers
+                                    LEFT JOIN users ON conveyance_vouchers.user_id = users.id
+                                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                    WHERE users.role = 4 AND conveyance_vouchers.success='no'
+                                    GROUP BY(conveyance_vouchers.unq_id)"));
+        $data['assmanager_con_success'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+                                    FROM conveyance_vouchers
+                                    LEFT JOIN users ON conveyance_vouchers.user_id = users.id
+                                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                    WHERE users.role = 4 AND conveyance_vouchers.success='yes'
+                                    GROUP BY(conveyance_vouchers.unq_id)"));
+         $data['ceo_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.review,conveyance_vouchers.created_at,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+                                    FROM conveyance_vouchers
+                                    LEFT JOIN users ON conveyance_vouchers.user_id = users.id
+                                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                    WHERE users.role = 6 AND conveyance_vouchers.success='no'
+                                    GROUP BY(conveyance_vouchers.unq_id)"));
+        $data['ceo_con_success'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.review,conveyance_vouchers.created_at,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+                                     FROM conveyance_vouchers
+                                     LEFT JOIN users ON conveyance_vouchers.user_id = users.id
+                                     LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                     WHERE users.role = 6 AND conveyance_vouchers.success='yes'
+                                     GROUP BY(conveyance_vouchers.unq_id)"));
+         $data['cfo_con'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+                                     FROM conveyance_vouchers
+                                     LEFT JOIN users ON conveyance_vouchers.user_id = users.id
+                                     LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                     WHERE users.role = 7 AND conveyance_vouchers.success='no'
+                                     GROUP BY(conveyance_vouchers.unq_id)"));
+        $data['cfo_con_success'] = DB::select(DB::raw("SELECT conveyance_vouchers.id,conveyance_vouchers.created_at,conveyance_vouchers.review,conveyance_vouchers.user_id,conveyance_vouchers.unq_id,conveyance_vouchers.designation_name,conveyance_vouchers.status,projectnames.project_name,users.role,SUM(conveyance_vouchers.amount) AS total
+                                     FROM conveyance_vouchers
+                                     LEFT JOIN users ON conveyance_vouchers.user_id = users.id
+                                     LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                                     WHERE users.role = 7 AND conveyance_vouchers.success='yes'
+                                     GROUP BY(conveyance_vouchers.unq_id)"));
+         $data['project-name'] = projectname::where('project_name','!=','General')->get();
         return view('Backend.Vas.transport_voucher',compact('data'));
     }
     public function makemessagecountZero($id,$userrole){
@@ -63,8 +102,14 @@ class TransportVoucherController extends Controller
         }
         return response()->json($find_notification);
     }
-    public function getallbillinfobyId($id){
-      $allBillinfo = ConveyanceVoucher::where('unq_id',$id)->get();
+    public function getallbillinfobyId($unq_id){
+      $allBillinfo =  DB::select(DB::raw("SELECT conveyance_vouchers.*,projectnames.project_name,projectnames.id as project_id
+                    FROM conveyance_vouchers
+                    LEFT JOIN projectnames ON conveyance_vouchers.project_id = projectnames.id
+                    WHERE conveyance_vouchers.unq_id = :unq_id"),array('unq_id' => $unq_id)); 
+      
+      
+    //   ConveyanceVoucher::where('unq_id',$id)->get();
       return response()->json($allBillinfo);
     }
     public function showsingledetailbill($id){
@@ -188,13 +233,13 @@ class TransportVoucherController extends Controller
         }else{
             $designation_name = "N/A";
         }
-        if($request->project_name !=null){
+        if($request->general_chk==1){
             $total = 0;
             foreach($request->program as $cost){
                 $conveyance = new ConveyanceVoucher();
                 $conveyance->user_id = $request->user_id;
                 $conveyance->designation_name = $designation_name;
-                $conveyance->project_name = $request->project_name;
+                $conveyance->project_id = $request->project_nameg;
                 $conveyance->date = $cost['date'];
                 $conveyance->from =  $cost['from'];
                 $conveyance->to =  $cost['to'];
@@ -230,7 +275,7 @@ class TransportVoucherController extends Controller
                 $conveyance->status =  $status;
                 $conveyance->notifiable_id = $notifiableid;
                 $conveyance->read_at = 'no';
-                $conveyance->project_name = "General";
+                $conveyance->project_id = $request->project_nameall;
                 $conveyance->save();
                 $total += $cost['amount'];
         }
@@ -335,6 +380,7 @@ class TransportVoucherController extends Controller
     foreach($request->program as $cost){
         $conveyance = new ConveyanceVoucher();
         $conveyance->user_id = $request->user_id;
+        $conveyance->project_id = $request->project_id;
         $conveyance->designation_name = $request->designation_name;
         $conveyance->date = $cost['date'];
         $conveyance->from =  $cost['from'];
@@ -347,7 +393,7 @@ class TransportVoucherController extends Controller
         $conveyance->notifiable_id = $notifiableid;
         $conveyance->read_at = 'no';
         $conveyance->review = 'reviwed';
-        $conveyance->project_name = $request->project_name;
+        // $conveyance->project_name = $request->project_name;
         $conveyance->save();
         $total += $cost['amount'];
         
@@ -357,7 +403,17 @@ class TransportVoucherController extends Controller
             $data['conveyance'] = $conveyance;
           return response()->json($data);
     }
+    public function transqrcode($id){
+        $qrdata = DB::table('conveyance_vouchers')
+                                        ->select(DB::raw('sum(conveyance_vouchers.amount) as totalexpense,users.name,projectnames.project_name'))
+                                        ->leftJoin ('users','conveyance_vouchers.user_id','=','users.id')
+                                        ->leftJoin ('projectnames','conveyance_vouchers.project_id','=','projectnames.id')
+                                        ->WHERE ('unq_id',$id)
+                                        ->first();
+        QrCode::format('png')->generate('transport.'.$id, '../public/images/'.$id.'.png');
 
+        return response()->json($qrdata);
+    }
     /**
      * Remove the specified resource from storage.
      *

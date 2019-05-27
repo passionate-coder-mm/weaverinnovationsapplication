@@ -76,8 +76,17 @@ $(document).on('click','.approveexpense',function(){
     var unqid=$(this).data('unqid');
     var notifiable = $(this).data('notifiable');
     var role = $(this).data('role');
-    $.get('/cash/approveexpense/'+unqid+'/'+notifiable+'/'+role,function(data){
-    toastr.options = {
+    $.ajax({
+        url: "{!! route('approve.expense') !!}",
+        type: "get", 
+        data: { 
+            unqid: unqid, 
+            notifiable: notifiable, 
+            role: role, 
+            
+        },
+        success: function(data) {
+            toastr.options = {
             "debug": false,
             "positionClass": "toast-bottom-right",
             "onclick": null,
@@ -87,15 +96,23 @@ $(document).on('click','.approveexpense',function(){
             "extendedTimeOut": 3000
             };
         toastr.success('Expense Request was approved successfully');
-        window.location.href = '/admin-dashboard'; 
-        console.log(data);
-   })
+        window.location.href = '/admin-dashboard';
+        }
+    });
+    
  });
 $(document).on('click','.reviewexpense',function(e){
     e.preventDefault;
     var unq_id = $(this).data('unqid');
-    $.get('/cash/sendexpenseforreview/'+unq_id,function(data){
-        toastr.options = {
+    $.ajax({
+        url: "{!! route('expense.review') !!}",
+        type: "get", 
+        data: { 
+            unq_id: unq_id, 
+            
+        },
+        success: function(data) {
+            toastr.options = {
             "debug": false,
             "positionClass": "toast-bottom-right",
             "onclick": null,
@@ -106,8 +123,9 @@ $(document).on('click','.reviewexpense',function(e){
             };
         toastr.success('You have sent it successfully for reviewing');
         window.location.href = '/admin-dashboard'; 
-
-    })
+        }
+    });
+    
 })
 </script>
 @endsection

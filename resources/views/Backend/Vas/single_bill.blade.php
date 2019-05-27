@@ -100,8 +100,14 @@ $(document).on('click','.approveconveyance',function(){
 $(document).on('click','.review',function(e){
     e.preventDefault;
     var unq_id = $(this).data('unqid');
-    $.get('/transport/sendforreview/'+unq_id,function(data){
-        toastr.options = {
+    $.ajax({
+        url: "{!! route('transsend.review') !!}",
+        type: "get", 
+        data: {  
+            unq_id: unq_id
+        },
+        success: function(daa) {
+            toastr.options = {
             "debug": false,
             "positionClass": "toast-bottom-right",
             "onclick": null,
@@ -112,8 +118,9 @@ $(document).on('click','.review',function(e){
             };
         toastr.success('You have sent it successfully for reviewing');
         window.location.href = '/admin-dashboard'; 
-
-    })
+        }
+       
+    });
 })
 </script>
 @endsection

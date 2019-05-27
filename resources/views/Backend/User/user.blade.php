@@ -605,8 +605,8 @@ $(document).on('change','#departmentwiseloadchange',function(){
   });
 
   //User insertion
-  $(document).on('submit','#userform', function(eveent){
-     eveent.preventDefault();
+  $(document).on('submit','#userform', function(event){
+     event.preventDefault();
         $.ajax({
             url:"{{route('user_options.store')}}",
             method:"POST",

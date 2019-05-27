@@ -4,7 +4,7 @@
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>A</b>LT</span>
       <!-- logo for regular state and mobile devices -->
-    <span class="logo-lg"><img src="{{url('images/img1.png')}}" width="150" height="50"></span>
+    <span class="logo-lg">Weaver Innovations</span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -43,12 +43,12 @@
                                       LEFT JOIN users ON conveyance_vouchers.user_id = users.id
                                       WHERE conveyance_vouchers.notifiable_id = $user_id AND conveyance_vouchers.read_at ='no'
                                       GROUP BY(conveyance_vouchers.unq_id)"));
-       $data['manager_messageforcash'] = DB::select(DB::raw("SELECT users.name,users.image,projectnames.project_name,cashvouchers.unq_id,cashvouchers.review,cashvouchers.created_at,SUM(cashvouchers.amount) AS total
+       $data['manager_messageforcash'] = DB::select(DB::raw("SELECT users.name,users.image,projectnames.project_name,cashvouchers.unq_id,cashvouchers.type,cashvouchers.review,cashvouchers.created_at,SUM(cashvouchers.amount) AS total
                                       FROM cashvouchers
                                       LEFT JOIN users ON cashvouchers.user_id = users.id
                                       LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                                       WHERE cashvouchers.notifiable_id = $user_id AND cashvouchers.read_at ='no'
-                                      GROUP BY(cashvouchers.unq_id)"));
+                                      GROUP BY(cashvouchers.unq_id) Order By cashvouchers.created_at desc"));
       $data['manager_messageforcashespense'] = DB::select(DB::raw("SELECT users.name,users.image,projectnames.project_name,expenseadvances.unq_id,expenseadvances.anotherunq_id,expenseadvances.review,expenseadvances.created_at,SUM(expenseadvances.advance_expense) AS total
                                       FROM expenseadvances
                                       LEFT JOIN users ON expenseadvances.user_id = users.id
@@ -157,8 +157,8 @@
                 @endforeach
                 @foreach( $data['manager_messageforcash'] as $cashmessage)
                 <li>
-                <a href="{{url('cash/singlemessage/'.$cashmessage->unq_id)}}">
-                    <div class="pull-left">
+                    <a href="{{route('cash.detail',['unq_id'=>$cashmessage->unq_id])}}">
+                        <div class="pull-left">
                       <img src="{{url('/'.$cashmessage->image)}}" class="img-circle" alt="User Image">
                     </div>
                     <h4>
@@ -171,7 +171,7 @@
                     </h4>
                     <p>Project Name: {{$cashmessage->project_name}}</p>
                   <p>Total: {{$cashmessage->total}} TK</p>
-                  <p>Voucher Type: Cash</p>
+                  <p>Voucher Type:{{$cashmessage->type}}</p>
                   <p>
                     Status:
                   @if($cashmessage->review =='yes')
@@ -187,7 +187,7 @@
                 @endforeach
                 @foreach($data['manager_messageforcashespense'] as $cashexpense)
                 <li>
-                <a href="{{url('cash/singlemessageforexpense/'.$cashexpense->anotherunq_id)}}">
+                <a href="{{route('expensebill.detail',['anotherunqid'=>$cashexpense->anotherunq_id])}}">
                     <div class="pull-left">
                       <img src="{{url('/'.$cashexpense->image)}}" class="img-circle" alt="User Image">
                     </div>
@@ -261,8 +261,8 @@
                  @endforeach
                  @foreach( $data['ceo_messageforcash'] as $cashmessage)
                 <li>
-                <a href="{{url('cash/singlemessage/'.$cashmessage->unq_id)}}">
-                    <div class="pull-left">
+                    <a href="{{route('cash.detail',['unq_id'=>$cashmessage->unq_id])}}">
+                        <div class="pull-left">
                       <img src="{{url('/'.$cashmessage->image)}}" class="img-circle" alt="User Image">
                     </div>
                     <h4>
@@ -289,8 +289,8 @@
                 @endforeach
                 @foreach($data['ceo_messageforcashespense'] as $cashexpense)
                 <li>
-                <a href="{{url('cash/singlemessageforexpense/'.$cashexpense->anotherunq_id)}}">
-                    <div class="pull-left">
+                    <a href="{{route('expensebill.detail',['anotherunqid'=>$cashexpense->anotherunq_id])}}">
+                        <div class="pull-left">
                       <img src="{{url('/'.$cashexpense->image)}}" class="img-circle" alt="User Image">
                     </div>
                     <h4>
@@ -363,8 +363,8 @@
                  @endforeach
                  @foreach( $data['cfo_messageforcash'] as $cashmessage)
                 <li>
-                <a href="{{url('cash/singlemessage/'.$cashmessage->unq_id)}}">
-                    <div class="pull-left">
+                    <a href="{{route('cash.detail',['unq_id'=>$cashmessage->unq_id])}}">
+                        <div class="pull-left">
                       <img src="{{url('/'.$cashmessage->image)}}" class="img-circle" alt="User Image">
                     </div>
                     <h4>
@@ -393,8 +393,8 @@
                 @endforeach
                 @foreach($data['cfo_messageforcashespense'] as $cashexpense)
                 <li>
-                <a href="{{url('cash/singlemessageforexpense/'.$cashexpense->anotherunq_id)}}">
-                    <div class="pull-left">
+                    <a href="{{route('expensebill.detail',['anotherunqid'=>$cashexpense->anotherunq_id])}}">
+                        <div class="pull-left">
                       <img src="{{url('/'.$cashexpense->image)}}" class="img-circle" alt="User Image">
                     </div>
                     <h4>
@@ -467,7 +467,7 @@
                  @endforeach
                  @foreach( $data['acc_messageforcash'] as $cashmessage)
                 <li>
-                <a href="{{url('cash/singlemessage/'.$cashmessage->unq_id)}}">
+                <a href="{{route('cash.detail',['unq_id'=>$cashmessage->unq_id])}}">
                     <div class="pull-left">
                       <img src="{{url('/'.$cashmessage->image)}}" class="img-circle" alt="User Image">
                     </div>
@@ -497,7 +497,7 @@
                 @endforeach
                 @foreach($data['acc_messageforcashespense'] as $cashexpense)
                 <li>
-                <a href="{{url('cash/singlemessageforexpense/'.$cashexpense->anotherunq_id)}}">
+                 <a href="{{route('expensebill.detail',['anotherunqid'=>$cashexpense->anotherunq_id])}}">
                     <div class="pull-left">
                       <img src="{{url('/'.$cashexpense->image)}}" class="img-circle" alt="User Image">
                     </div>

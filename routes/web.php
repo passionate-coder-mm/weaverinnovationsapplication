@@ -108,30 +108,47 @@ Route::group(['prefix' =>'leave'], function () {
     Route::get('singlemessage/{id}','Admin\TransportVoucherController@showsingledetailbill');
     Route::get('approveconveyancebymng/{id}/{notifiable}/{role}','Admin\TransportVoucherController@approveconveyanceBysuperior');
     Route::get('allpayabletransportBilllist','Admin\TransportVoucherController@allpaybleTransportbill');
-    Route::get('sendforreview/{unqid}','Admin\TransportVoucherController@reviewit');
+    Route::get('sendforreview','Admin\TransportVoucherController@reviewit')->name('transsend.review');
     Route::post('updatebillinfo','Admin\TransportVoucherController@update');
+    Route::get('transqr-code/{id}','Admin\TransportVoucherController@transqrcode');
+
 });
 Route::group(['prefix' =>'cash'], function () {
     Route::resource('cash-voucher','Admin\CashVoucherController');
-    Route::get('getallcashbillinfoByid/{unqid}','Admin\CashVoucherController@getallcashinfo');
-    Route::post('updatecashinfo','Admin\CashVoucherController@update');
-    Route::get('singlemessage/{id}','Admin\CashVoucherController@showsingledetailcashbill');
-    Route::get('approvecash/{unqid}/{notifiable}/{role}','Admin\CashVoucherController@approvecashBysuperior');
-    Route::get('sendforreview/{unqid}','Admin\CashVoucherController@reviewit');
-    Route::get('settlerequestdata/{unqid}','Admin\CashVoucherController@settlerequestdata');
-    Route::post('sendsettlerequest','Admin\CashVoucherController@sendsettleRequest');
-    Route::get('singlemessageforexpense/{unqid}','Admin\CashVoucherController@singlecashsettle');
-    Route::get('approveexpense/{unqid}/{notifiable}/{role}','Admin\CashVoucherController@approveadvanceSettle');
-    Route::get('sendexpenseforreview/{unqid}','Admin\CashVoucherController@reviewexpense');
-    Route::get('getadvancesettlelist/{unqid}','Admin\CashVoucherController@settlelistforadvance');
-    Route::post('upgradesettlerequest','Admin\CashVoucherController@updatesettlerequest');
+    Route::get('getallcashbillinfoByid','Admin\CashVoucherController@getallcashinfo')->name('all.cashinfo');
+    Route::get('getallcashbillinfocashByid','Admin\CashVoucherController@getallcashinfocash')->name('cashinfo.cash');
+    Route::get('getcashsettleinfo','Admin\CashVoucherController@getcashsettleinfo')->name('cashsettle.info');
+
+    
+    Route::post('updatecashinfo','Admin\CashVoucherController@update')->name('update.cashinfo');
+    Route::get('singlemessage','Admin\CashVoucherController@showsingledetailcashbill')->name('cash.detail');
+    Route::get('approvecash','Admin\CashVoucherController@approvecashBysuperior')->name('cash.approve');
+    Route::get('sendforreview','Admin\CashVoucherController@reviewit')->name('cashsend.review');
+    Route::get('settlerequestdata','Admin\CashVoucherController@settlerequestdata')->name('settle.data');
+    Route::post('sendsettlerequest','Admin\CashVoucherController@sendsettleRequest')->name('settele.store');
+    Route::get('singlemessageforexpense','Admin\CashVoucherController@singlecashsettle')->name('expensebill.detail');
+    Route::get('approveexpense','Admin\CashVoucherController@approveadvanceSettle')->name('approve.expense');
+    Route::get('sendexpenseforreview','Admin\CashVoucherController@reviewexpense')->name('expense.review');
+    Route::get('getadvancesettlelist','Admin\CashVoucherController@settlelistforadvance')->name('advance.settlelist');
+    Route::post('upgradesettlerequest','Admin\CashVoucherController@updatesettlerequest')->name('update.settle');
+    Route::get('cashqr-code','Admin\CashVoucherController@cashinfoInqrcode')->name('cash.qrcode');
+    Route::get('advanceqrcode','Admin\CashVoucherController@advanceqrcode')->name('qr.qrcode');
+    Route::get('makeitcomplete','Admin\CashVoucherController@makeitcomplete')->name('billpay.complete');
 
     
 
-    
 
+    //test
+    Route::get('testscanner','Admin\CashVoucherController@teastreader')->name('transaction.scane');
+    Route::get('getqrcodeinfo','Admin\CashVoucherController@getqrcodeinfo')->name('transaction.qrcodeinfo');
+    Route::get('transactionhelper','Admin\CashVoucherController@tshelper')->name('transaction.helper');
+    Route::post('updatehelperamnt','Admin\CashVoucherController@updatecashamount')->name('helper.updatecash');
+    Route::post('updatehelperpercentamnt','Admin\CashVoucherController@updatepercentcashamount')->name('helper.updatepercentcash');
     
- 
 });
+
+
+// Route::get('cashqr-code', function () {
+// }); 
 
 // Route::get('/home', 'HomeController@index')->name('home');

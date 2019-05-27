@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost/'),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -162,7 +162,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
-
+        SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -231,6 +231,7 @@ return [
         'Form' => Collective\Html\FormFacade::class,
          'Html' => Collective\Html\HtmlFacade::class,
          'Pusher' => Pusher\Pusher::class,
+         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
 
     ],
 

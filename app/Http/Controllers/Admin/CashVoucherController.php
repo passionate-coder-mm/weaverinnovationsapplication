@@ -12,8 +12,12 @@ use App\Expenseadvance;
 use DateTime;
 use DateTimeZone;
 use App\User;
+use App\Helper;
+use App\ConveyanceVoucher;
 use DB;
 use Auth;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
 
 class CashVoucherController extends Controller
 {
@@ -31,17 +35,23 @@ class CashVoucherController extends Controller
                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                             WHERE users.role = 5 And cashvouchers.type ='Advance' And cashvouchers.success ='no'
                             GROUP BY(cashvouchers.unq_id)"));
-        $data['for_executive_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
+        $data['for_executive_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.expenseamount,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                                             FROM cashvouchers
                                             LEFT JOIN users ON cashvouchers.user_id = users.id
                                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                                             WHERE users.role = 5 And cashvouchers.type ='Advance' And cashvouchers.success ='yes'
                                             GROUP BY(cashvouchers.unq_id)"));
-        $data['for_executive_ad_expenses'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
+        $data['for_executive_ad_expenses'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.anotherunq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
                                             FROM expenseadvances
                                             LEFT JOIN users ON expenseadvances.user_id = users.id
                                             LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
-                                            WHERE users.role = 5 AND expenseadvances.type ='advanceexpense' 
+                                            WHERE users.role = 5 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='no' 
+                                            GROUP BY(expenseadvances.anotherunq_id)"));
+         $data['for_executive_ad_expenses_success'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.anotherunq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
+                                            FROM expenseadvances
+                                            LEFT JOIN users ON expenseadvances.user_id = users.id
+                                            LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
+                                            WHERE users.role = 5 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='yes' 
                                             GROUP BY(expenseadvances.anotherunq_id)"));
         $data['for_executive_expense'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                                 FROM cashvouchers
@@ -61,7 +71,7 @@ class CashVoucherController extends Controller
                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                             WHERE users.role = 4 And cashvouchers.type ='Advance' And cashvouchers.success ='no'
                             GROUP BY(cashvouchers.unq_id)"));
-         $data['for_assmng_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
+         $data['for_assmng_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.expenseamount,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                                         FROM cashvouchers
                                         LEFT JOIN users ON cashvouchers.user_id = users.id
                                         LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
@@ -71,8 +81,14 @@ class CashVoucherController extends Controller
                                             FROM expenseadvances
                                             LEFT JOIN users ON expenseadvances.user_id = users.id
                                             LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
-                                            WHERE users.role = 4 AND expenseadvances.type ='advanceexpense' 
+                                            WHERE users.role = 4 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='no' 
                                             GROUP BY(expenseadvances.anotherunq_id)"));
+         $data['for_assmng_ad_expenses_success'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
+                                             FROM expenseadvances
+                                             LEFT JOIN users ON expenseadvances.user_id = users.id
+                                             LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
+                                             WHERE users.role = 4 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='yes' 
+                                             GROUP BY(expenseadvances.anotherunq_id)"));
         $data['for_assmng_expense'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                             FROM cashvouchers
                             LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -85,7 +101,7 @@ class CashVoucherController extends Controller
                              LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                              WHERE users.role = 4 And cashvouchers.type ='Expense' And cashvouchers.success ='yes'
                              GROUP BY(cashvouchers.unq_id)"));
-        $data['for_manager'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
+        $data['for_manager'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.expenseamount,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                             FROM cashvouchers
                             LEFT JOIN users ON cashvouchers.user_id = users.id
                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
@@ -101,8 +117,14 @@ class CashVoucherController extends Controller
                                         FROM expenseadvances
                                         LEFT JOIN users ON expenseadvances.user_id = users.id
                                         LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
-                                        WHERE users.role = 3 AND expenseadvances.type ='advanceexpense' 
+                                        WHERE users.role = 3 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='no' 
                                         GROUP BY(expenseadvances.anotherunq_id)"));
+         $data['for_manager_ad_expenses_success'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
+                                         FROM expenseadvances
+                                         LEFT JOIN users ON expenseadvances.user_id = users.id
+                                         LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
+                                         WHERE users.role = 3 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='yes' 
+                                         GROUP BY(expenseadvances.anotherunq_id)"));
         $data['for_manager_expense'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                             FROM cashvouchers
                             LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -122,7 +144,7 @@ class CashVoucherController extends Controller
                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                             WHERE users.role = 6 And cashvouchers.type ='Advance' And cashvouchers.success ='no'
                             GROUP BY(cashvouchers.unq_id)"));
-        $data['for_ceo_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
+        $data['for_ceo_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.expenseamount,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                                         FROM cashvouchers
                                         LEFT JOIN users ON cashvouchers.user_id = users.id
                                         LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
@@ -132,8 +154,14 @@ class CashVoucherController extends Controller
                                         FROM expenseadvances
                                         LEFT JOIN users ON expenseadvances.user_id = users.id
                                         LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
-                                        WHERE users.role = 6 AND expenseadvances.type ='advanceexpense' 
+                                        WHERE users.role = 6 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='no' 
                                         GROUP BY(expenseadvances.anotherunq_id)"));
+        $data['for_ceo_ad_expenses_success'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
+                                         FROM expenseadvances
+                                         LEFT JOIN users ON expenseadvances.user_id = users.id
+                                         LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
+                                         WHERE users.role = 6 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='yes' 
+                                         GROUP BY(expenseadvances.anotherunq_id)"));
         $data['for_ceo_expense'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                             FROM cashvouchers
                             LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -152,7 +180,7 @@ class CashVoucherController extends Controller
                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                             WHERE users.role = 7 And cashvouchers.type ='Advance' And cashvouchers.success ='no'
                             GROUP BY(cashvouchers.unq_id)"));
-        $data['for_cfo_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
+        $data['for_cfo_ad_succeed']= DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.expenseamount,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                                         FROM cashvouchers
                                         LEFT JOIN users ON cashvouchers.user_id = users.id
                                         LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
@@ -162,8 +190,14 @@ class CashVoucherController extends Controller
                                         FROM expenseadvances
                                         LEFT JOIN users ON expenseadvances.user_id = users.id
                                         LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
-                                        WHERE users.role = 7 AND expenseadvances.type ='advanceexpense' 
+                                        WHERE users.role = 7 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='no' 
                                         GROUP BY(expenseadvances.anotherunq_id)"));
+        $data['for_cfo_ad_expenses_success'] = DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.review,expenseadvances.type,expenseadvances.advance_amount,expenseadvances.created_at,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.status,projectnames.project_name,SUM(expenseadvances.advance_expense) AS totalexpense,projectnames.id AS projectid,users.role
+                                         FROM expenseadvances
+                                         LEFT JOIN users ON expenseadvances.user_id = users.id
+                                         LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
+                                         WHERE users.role = 7 AND expenseadvances.type ='advanceexpense' And expenseadvances.success ='yes' 
+                                         GROUP BY(expenseadvances.anotherunq_id)"));
         $data['for_cfo_expense'] = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.review,cashvouchers.type,cashvouchers.created_at,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.designation_name,cashvouchers.status,projectnames.project_name,projectnames.id as projectid,users.role,SUM(cashvouchers.amount) AS total
                             FROM cashvouchers
                             LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -176,11 +210,13 @@ class CashVoucherController extends Controller
                             LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
                             WHERE users.role = 7 And cashvouchers.type ='Expense' And cashvouchers.success ='yes'
                             GROUP BY(cashvouchers.unq_id)"));
-        $data['project-name'] = projectname::all();
+        $data['project-name'] = projectname::where('project_name','!=','General')->get();
+        $data['percent'] = Helper::find(1);
         return view('Backend.Vas.cash_voucher',compact('data'));
     }
 
-    public function showsingledetailcashbill($unqid){
+    public function showsingledetailcashbill(Request $request){
+        $unqid = $request->unq_id;
         $find_single_cashbill =  DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.date,cashvouchers.description,cashvouchers.amount,cashvouchers.review,cashvouchers.type,cashvouchers.user_id,cashvouchers.unq_id,cashvouchers.status,projectnames.project_name,users.role,users.name
                                 FROM cashvouchers
                                 LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -189,7 +225,8 @@ class CashVoucherController extends Controller
          $first_item = Cashvoucher::where('unq_id',$unqid)->first();
         return view('Backend.Vas.single_cashbill',compact('find_single_cashbill','first_item'));
     }
-    public function settlerequestdata($unq_id){
+    public function settlerequestdata(Request $request){
+        $unq_id = $request->unq_id;
         $find_advancebill_by_id = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.created_at,cashvouchers.type,cashvouchers.unq_id,projectnames.id AS projectid,projectnames.project_name,users.id AS userid,users.role,SUM(cashvouchers.amount) AS total
                                             FROM cashvouchers
                                             LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -198,7 +235,7 @@ class CashVoucherController extends Controller
         return response()->json($find_advancebill_by_id);
     }
     public function sendsettleRequest(Request $request){
-        //return ($request->all());
+        // return ($request->totalexp);
         $unique_id = uniqid();
          $find_login_user_dept_id = Userdepartment::where('user_id',$request->user_id)->first();
          $user_role = $request->role;
@@ -247,6 +284,7 @@ class CashVoucherController extends Controller
             $notfication->anotherunq_id = $unique_id;
             $notfication->save();
         }
+        $total = 0;
        foreach($request->program as $expenseclaim){
             $expenseClaim = new Expenseadvance();
             $expenseClaim->date = $expenseclaim['date'];
@@ -266,10 +304,16 @@ class CashVoucherController extends Controller
             $expenseClaim->save();
         }
         
+        $findCashvoucher = Cashvoucher::where('unq_id','=',$request->unq_id)->get();
+        foreach($findCashvoucher as $val){
+            $val->expenseamount = $request->totalexp + $val->expenseamount;
+            $val->save();
+        }
 
-      return response()->json($notfication);
+      return response()->json($expenseClaim);
     }
-    public function singlecashsettle($anotherunqid){
+    public function singlecashsettle(Request $request){
+        $anotherunqid = $request->anotherunqid;
         $find_single_advancesettle =  DB::select(DB::raw("SELECT expenseadvances.id,expenseadvances.date,expenseadvances.description,expenseadvances.advance_expense,expenseadvances.review,expenseadvances.type,expenseadvances.user_id,expenseadvances.unq_id,expenseadvances.status,projectnames.project_name,users.role,users.name
                                 FROM expenseadvances
                                 LEFT JOIN users ON expenseadvances.user_id = users.id
@@ -278,7 +322,11 @@ class CashVoucherController extends Controller
         $first_item = Expenseadvance::where('anotherunq_id',$anotherunqid)->first();
         return view('Backend.Vas.single_advancesettle',compact('find_single_advancesettle','first_item'));
     }
-    public function approveadvanceSettle($id,$notifiable,$role){
+    public function approveadvanceSettle(Request $request){
+        $id = $request->unqid;
+        $notifiable = $request->notifiable;
+        $role = $request->role;
+
         $find_ceo = User::where('role','=',6)->first();
         $find_cfo = User::where('role','=',7)->first();
         $dt = new DateTime("now", new DateTimeZone('Asia/Dhaka'));
@@ -297,12 +345,16 @@ class CashVoucherController extends Controller
        }
         return response()->json('success');
     }
-    public function reviewexpense($unqid){
+    public function reviewexpense(Request $request){
+        $unqid = $request->unq_id;
         $send_for_review = Expenseadvance::where('anotherunq_id',$unqid)->update(['review'=>'yes']);
         return response()->json('success');
     }
 
-    public function approvecashBysuperior($id,$notifiable,$role){
+    public function approvecashBysuperior(Request $request){
+        $id = $request->unqid;
+        $notifiable = $request->notifiable;
+        $role = $request->role;
         $find_ceo = User::where('role','=',6)->first();
         $find_cfo = User::where('role','=',7)->first();
         $dt = new DateTime("now", new DateTimeZone('Asia/Dhaka'));
@@ -321,9 +373,36 @@ class CashVoucherController extends Controller
        }
         return response()->json('success');
     }
-    public function reviewit($unqid){
+    public function reviewit(Request $request){
+        $unqid = $request->unq_id; 
         $send_for_review = Cashvoucher::where('unq_id',$unqid)->update(['review'=>'yes']);
         return response()->json('success');
+    }
+    public function cashinfoInqrcode(Request $request){  
+            $id = $request->id;
+            $qrdata = DB::table('expenseadvances')
+                                        ->select(DB::raw('sum(expenseadvances.advance_expense) as totalexpense, expenseadvances.advance_amount,expenseadvances.type,users.name,projectnames.project_name'))
+                                        ->leftJoin ('users','expenseadvances.user_id','=','users.id')
+                                        ->leftJoin ('projectnames','expenseadvances.project_id','=','projectnames.id')
+                                        ->WHERE ('anotherunq_id',$id)
+                                        ->first();
+        QrCode::format('png')->generate('advanceexpense.'.$id, '../public/images/'.$id.'.png');
+
+        return response()->json($qrdata);
+
+    }
+    public function advanceqrcode(Request $request){
+        $id = $request->id;
+        $type = $request->type;
+        QrCode::format('png')->generate($type.'.'.$id ,'../public/images/'.$id.'.png');
+        $findQrinfo = DB::table('cashvouchers')
+                    ->select(DB::raw('sum(cashvouchers.amount) as total,cashvouchers.type,users.name,projectnames.project_name'))
+                    ->leftJoin ('users','cashvouchers.user_id','=','users.id')
+                    ->leftJoin ('projectnames','cashvouchers.project_id','=','projectnames.id')
+                    ->WHERE ('unq_id',$id)
+                    ->first();
+        return response()->json($findQrinfo);
+
     }
 
     /**
@@ -449,7 +528,23 @@ class CashVoucherController extends Controller
         
     }
 
-    public function getallcashinfo($unqid){
+    public function getallcashinfo(Request $request){
+        $unqid = $request->unq_id;
+        $anotherunqid = $request->anotherunq_id;
+        $getCashinfo = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.unq_id,cashvouchers.date,cashvouchers.type,cashvouchers.designation_name,projectnames.project_name,projectnames.id as projectid,users.name,users.id as user_id,cashvouchers.amount,cashvouchers.description
+                        FROM cashvouchers
+                        LEFT JOIN users ON cashvouchers.user_id = users.id
+                        LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
+                        WHERE cashvouchers.unq_id = :unq_id"),array('unq_id' => $unqid)); 
+        $getSettlelist = DB::select(DB::raw("SELECT expenseadvances.date,expenseadvances.advance_expense,expenseadvances.description
+                                            FROM expenseadvances
+                                            WHERE expenseadvances.anotherunq_id = :anotherunq_id"),array('anotherunq_id' => $anotherunqid));
+                        
+        return response()->json([$getCashinfo,$getSettlelist]);
+    }
+
+    public function getcashsettleinfo(Request $request){
+        $unqid = $request->unq_id;
         $getCashinfo = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.unq_id,cashvouchers.date,cashvouchers.type,cashvouchers.designation_name,projectnames.project_name,projectnames.id as projectid,users.name,users.id as user_id,cashvouchers.amount,cashvouchers.description
                         FROM cashvouchers
                         LEFT JOIN users ON cashvouchers.user_id = users.id
@@ -461,12 +556,22 @@ class CashVoucherController extends Controller
                         
         return response()->json([$getCashinfo,$getSettlelist]);
     }
-    public function settlelistforadvance($unqid){
+    public function getallcashinfocash (Request $request){
+        $unqid = $request->unq_id;
+        $getCashinfo = DB::select(DB::raw("SELECT cashvouchers.id,cashvouchers.unq_id,cashvouchers.date,cashvouchers.type,cashvouchers.designation_name,projectnames.project_name,projectnames.id as projectid,users.name,users.id as user_id,cashvouchers.amount,cashvouchers.description
+                        FROM cashvouchers
+                        LEFT JOIN users ON cashvouchers.user_id = users.id
+                        LEFT JOIN projectnames ON cashvouchers.project_id = projectnames.id
+                        WHERE cashvouchers.unq_id = :unq_id"),array('unq_id' => $unqid));               
+        return response()->json($getCashinfo);
+    }
+    public function settlelistforadvance(Request $request){
+        $unqid = $request->unq_id;
         $getSettlelist = DB::select(DB::raw("SELECT expenseadvances.date,expenseadvances.advance_amount,expenseadvances.advanceclaim_date,users.role,users.id as userid,projectnames.id as projectid,expenseadvances.unq_id,expenseadvances.anotherunq_id,expenseadvances.advance_expense,expenseadvances.description
                                             FROM expenseadvances
                                             LEFT JOIN users ON expenseadvances.user_id = users.id
                                            LEFT JOIN projectnames ON expenseadvances.project_id = projectnames.id
-                                            WHERE expenseadvances.unq_id = :unq_id"),array('unq_id' => $unqid));
+                                            WHERE expenseadvances.anotherunq_id = :anotherunq_id"),array('anotherunq_id' => $unqid));
         return response()->json($getSettlelist);
 
     }
@@ -544,10 +649,108 @@ class CashVoucherController extends Controller
             $expenseClaim->type = 'advanceexpense';
             $expenseClaim->save();
         }
+        // $expenseAmount =  DB::select(DB::raw(" SELECT SUM(advance_expense) as total FROM expenseadvances WHERE unq_id = :unq_id"),array('unq_id' => $request->unq_id));
+        $expenseAmount = DB::table('expenseadvances')
+                          ->select(DB::raw("SUM(advance_expense) as total"))->where('unq_id','=',$request->unq_id)->first();
+        $findCash = Cashvoucher::where('unq_id','=',$request->unq_id)->get();
+        foreach($findCash as $val){
+            $val->expenseamount =  $expenseAmount->total;
+            $val->save();
+        }
          //$data = $request->all();
-        return response()->json('Success');
+        return response()->json($expenseAmount->total);
     }
+    public function teastreader(){
+        return view('Backend.Vas.transaction');
+    }
+    public function getqrcodeinfo(Request $request){
+        $content = $request->content;
+        $expldContent = explode(".",$content);
+        if($expldContent[0] =='Advance' || $expldContent[0]=='Expense'){
+            $findQrinfo = DB::table('cashvouchers')
+                    ->select(DB::raw('sum(cashvouchers.amount) as total,cashvouchers.type,cashvouchers.success,cashvouchers.unq_id,users.name,projectnames.project_name'))
+                    ->leftJoin ('users','cashvouchers.user_id','=','users.id')
+                    ->leftJoin ('projectnames','cashvouchers.project_id','=','projectnames.id')
+                    ->WHERE ('unq_id',$expldContent[1])
+                    ->first();
+            $totalCash = Helper::find(1);
+            return response()->json([$findQrinfo,$totalCash]);
 
+
+        } elseif($expldContent[0]=='advanceexpense'){
+            $findQrinfo = DB::table('expenseadvances')
+                    ->select(DB::raw('sum(expenseadvances.advance_expense) as total,expenseadvances.type,expenseadvances.success,expenseadvances.advance_amount,expenseadvances.anotherunq_id,users.name,projectnames.project_name'))
+                    ->leftJoin ('users','expenseadvances.user_id','=','users.id')
+                    ->leftJoin ('projectnames','expenseadvances.project_id','=','projectnames.id')
+                    ->WHERE ('anotherunq_id',$expldContent[1])
+                    ->first();
+                    $totalCash = Helper::find(1);
+                    return response()->json([$findQrinfo,$totalCash]);
+
+        }elseif($expldContent[0]=='transport'){
+
+            $findQrinfo = DB::table('conveyance_vouchers')
+                        ->select(DB::raw('sum(conveyance_vouchers.amount) as total,conveyance_vouchers.type,conveyance_vouchers.success,conveyance_vouchers.unq_id,users.name,projectnames.project_name'))
+                        ->leftJoin ('users','conveyance_vouchers.user_id','=','users.id')
+                        ->leftJoin ('projectnames','conveyance_vouchers.project_id','=','projectnames.id')
+                        ->WHERE ('unq_id',$expldContent[1])
+                        ->first();
+            $totalCash = Helper::find(1);
+            return response()->json([$findQrinfo,$totalCash]);
+
+        } else{
+            return response()->json('Something else');
+        }
+        
+    }
+    public function makeitcomplete(Request $request){
+        $id = $request->unqid;
+        $type = $request->type;
+        $expense = $request->expense;
+        if(Auth::check()){
+            $user_id = Auth::user()->id;
+         }else{
+             return redirect('/login');
+         }
+        unlink('images/'.$id.'.png');
+        $dt = new DateTime("now", new DateTimeZone('Asia/Dhaka'));
+        $time= $dt->format('m-d-Y, H:i:s');
+        if($type=='Advance'||$type=='Expense'){
+            $findId = Cashvoucher::where('unq_id','=',$id)->get();
+            $findcashamount = Helper::find(1);
+            $findcashamount->cash_amount = $findcashamount->cash_amount - $expense;
+            $findcashamount->save();
+            foreach($findId as $val){
+                $val->success = 'yes';
+                $val->accapproved_date = $time;
+                $val->approvedby_acc = $user_id;
+                $val->save();
+            }
+
+        }elseif($type=='advanceexpense'){
+            $findId = Expenseadvance::where('anotherunq_id','=',$id)->get();
+            foreach($findId as $val){
+                $val->success = 'yes';
+                $val->accapproved_date = $time;
+                $val->approvedby_acc = $user_id;
+                $val->save();
+            }
+        }elseif($type=='transport'){
+            $findId = ConveyanceVoucher::where('unq_id','=',$id)->get();
+            $findcashamount = Helper::find(1);
+            $findcashamount->cash_amount = $findcashamount->cash_amount - $expense;
+            $findcashamount->save();
+            foreach($findId as $val){
+                $val->success = 'yes';
+                $val->accapproved_date = $time;
+                $val->approvedby_acc = $user_id;
+                $val->save();
+            }
+        }
+        
+        return response()->json('success');
+    }
+    
     /**
      * Display the specified resource.
      *
@@ -690,7 +893,23 @@ class CashVoucherController extends Controller
         // $data = $request->all();
         // return response()->json($data);
     }
-
+    public function tshelper(){
+        $helperInfo = Helper::find(1);
+        return view('Backend.Vas.tshelper',compact('helperInfo'));
+    }
+    public function updatecashamount(Request $request){
+        $helperInfo = Helper::find(1);
+        $helperInfo->cash_amount = $request->cash_amount +  $helperInfo->cash_amount;
+        $helperInfo->save();
+        return response()->json($helperInfo);
+    }
+    public function updatepercentcashamount(Request $request){
+        $helperInfo = Helper::find(1);
+        $helperInfo->percent_amount = $request->percent_amount;
+        $helperInfo->save();
+        return response()->json($helperInfo);
+    }
+    
     /**
      * Remove the specified resource from storage.
      *

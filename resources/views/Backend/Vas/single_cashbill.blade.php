@@ -76,26 +76,34 @@ $(document).on('click','.approvecash',function(){
     var unqid=$(this).data('unqid');
     var notifiable = $(this).data('notifiable');
     var role = $(this).data('role');
-    $.get('/cash/approvecash/'+unqid+'/'+notifiable+'/'+role,function(data){
-    toastr.options = {
-            "debug": false,
-            "positionClass": "toast-bottom-right",
-            "onclick": null,
-            "fadeIn": 300,
-            "fadeOut": 1000,
-            "timeOut": 5000,
-            "extendedTimeOut": 3000
-            };
-        toastr.success('Bill was approved successfully');
-        window.location.href = '/admin-dashboard'; 
-        console.log(data);
-   })
+
+    $.ajax({
+    url: "{!! route('cash.approve') !!}",
+    type: "get", 
+    data: { 
+        unqid: unqid, 
+        notifiable: notifiable, 
+        role: role
+    },
+    success: function(response) {
+        //Do Something
+        console.log(type);
+    },
+    error: function(xhr) {
+    }
+    });
  });
 $(document).on('click','.review',function(e){
     e.preventDefault;
     var unq_id = $(this).data('unqid');
-    $.get('/cash/sendforreview/'+unq_id,function(data){
-        toastr.options = {
+    $.ajax({
+        url: "{!! route('cashsend.review') !!}",
+        type: "get", 
+        data: {  
+            unq_id: unq_id
+        },
+        success: function(daa) {
+            toastr.options = {
             "debug": false,
             "positionClass": "toast-bottom-right",
             "onclick": null,
@@ -106,8 +114,10 @@ $(document).on('click','.review',function(e){
             };
         toastr.success('You have sent it successfully for reviewing');
         window.location.href = '/admin-dashboard'; 
-
-    })
+        }
+       
+    });
+    
 })
 </script>
 @endsection

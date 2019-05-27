@@ -77,9 +77,12 @@
               </a>
               <ul class="treeview-menu">
                 <li><a href="{{route('transport-voucher.index')}}"><i class="fa fa-circle-o"></i>Transport/Conveyance</a></li>
-                <li><a href="{{route('transport-voucher.index')}}"><i class="fa fa-circle-o"></i>Approval List</a></li>
+                {{-- <li><a href="{{route('transport-voucher.index')}}"><i class="fa fa-circle-o"></i>Approval List</a></li> --}}
                 <li><a href="{{route('cash-voucher.index')}}"><i class="fa fa-circle-o"></i>Cash Payment</a></li>
-             </ul>
+                <li><a href="{{route('transaction.scane')}}"><i class="fa fa-circle-o"></i>Transaction</a></li>
+                <li><a href="{{route('transaction.helper')}}"><i class="fa fa-circle-o"></i>Transaction Helper</a></li>
+
+              </ul>
             </li>
            </ul>
     </section>

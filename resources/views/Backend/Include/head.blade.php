@@ -38,6 +38,8 @@
           <![endif]-->
          
           <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+          <script type="text/javascript" src="{{asset('themeasset/instascan.min.js')}}" ></script>
+
           {{-- <link rel="stylesheet" href="/resources/demos/style.css"> --}}
           <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
           <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -48,9 +50,11 @@
           <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
           <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.14.0/printThis.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.14.0/printThis.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.14.0/printThis.min.js.map"></script>
+         
+
+          {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.14.0/printThis.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.14.0/printThis.min.js"></script> --}}
+          {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.14.0/printThis.min.js.map"></script> --}}
           <!-- Google Font -->
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
           <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
